@@ -1,4 +1,4 @@
-package Exception;
+package game.Exception;
 
 public class placeholder {
     

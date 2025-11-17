@@ -1,4 +1,4 @@
-package BlackJack;
+package game.BlackJack;
 
 public class placeholder {
     
