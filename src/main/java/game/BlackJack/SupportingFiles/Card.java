@@ -1,24 +1,27 @@
 package game.BlackJack.SupportingFiles;
 
-public class Card {
-    private String suit;
-    private String rank;
+import game.BlackJack.SupportingFiles.CardEnums.Suit;
+import game.BlackJack.SupportingFiles.CardEnums.Rank;
 
-    public Card(String suit, String rank) {
+public class Card {
+    private final Suit suit;
+    private final Rank rank;
+
+    public Card(Suit suit, Rank rank) {
         this.suit = suit;
         this.rank = rank;
     }
 
-    public String getSuit() {
+    public Suit getSuit() {
         return suit;
     }
 
-    public String getRank() {
+    public Rank getRank() {
         return rank;
     }
 
     @Override
     public String toString() {
-        return suit.equals("Pizza Coupon") ? "30% Discount Pizza" : rank + " of " + suit;
+        return suit == Suit.PIZZA_COUPON ? "30% Discount Pizza" : rank + " of " + suit;
     }   
 }

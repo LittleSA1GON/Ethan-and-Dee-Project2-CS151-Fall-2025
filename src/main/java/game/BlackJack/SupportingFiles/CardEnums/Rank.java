@@ -14,7 +14,7 @@ public enum Rank {
     JACK("Jack"),
     QUEEN("Queen"),
     KING("King"),
-    THIRTY_PERCENT_DISCOUNT_PIZZA("30% Discount Pizza");
+    PIZZA_DISCOUNT("30% Discount Pizza");
 
     private final String valueString;
 
