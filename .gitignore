@@ -1,0 +1,18 @@
+# Maven build output
+/target/
+
+# VSCode settings
+.vscode/
+
+# OS-specific
+.DS_Store
+
+# === Java-specific ===
+*.class
+*.jar
+*.war
+*.ear
+
+# === Maven-specific ===
+.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.properties
