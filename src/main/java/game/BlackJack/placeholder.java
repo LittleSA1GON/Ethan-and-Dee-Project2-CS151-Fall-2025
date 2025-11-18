@@ -1,4 +1,4 @@
-package game.BlackJack;
+package game.blackjack;
 
 public class placeholder {
     
