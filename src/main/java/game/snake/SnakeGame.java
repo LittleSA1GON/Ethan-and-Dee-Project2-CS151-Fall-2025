@@ -3,12 +3,15 @@ package game.snake;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 
 public class SnakeGame {
 
@@ -25,8 +28,8 @@ public class SnakeGame {
     public SnakeGame(){ 
         this.toolBar = initToolBar(); //incorporating abstraction everywhere possible to make code readable
         this.scoreHBox = initScoreHBox();
-        this.canvas = new Canvas(800, 520); //if let Stage Size be 800 x 600
-        this.root = constructRoot(toolBar, scoreHBox, canvas);
+        this.canvas = constructCanvas(); //assuming we let Stage Size be 800 x 600
+        this.root = constructRoot();
     }//end of constructor
 
     private ToolBar initToolBar(){ //initializing ToolBar (update this after completing game manager)
@@ -47,11 +50,27 @@ public class SnakeGame {
          return hBox;
     } //end of initScoreHBox
 
-    private VBox constructRoot(ToolBar toolBar, HBox scoreHBox, Canvas canvas){
+    private Canvas constructCanvas(){
+
+        Canvas canvasL = new Canvas(720, 460);
+        GraphicsContext gc = canvasL.getGraphicsContext2D();
+
+        //set visible border
+        gc.setStroke(Color.PURPLE);
+        gc.setLineWidth(10); 
+        gc.strokeRect(5, 5, canvasL.getWidth() - 10, canvasL.getHeight() - 10);
+
+        return canvasL;
+    }//end of constructCanvas
+
+    private VBox constructRoot(){
         VBox vBox = new VBox(10);
         vBox.setPadding(new Insets(15));
 
-        vBox.getChildren().addAll(toolBar, scoreHBox, canvas);
+        StackPane canvasHolderPane = new StackPane(canvas);
+        canvasHolderPane.setAlignment(Pos.CENTER);
+
+        vBox.getChildren().addAll(this.toolBar, this.scoreHBox, canvasHolderPane);
         return vBox;
     }
 

@@ -1,1 +1,1 @@
-package game.GameManager;
+package game.gamemanager;
