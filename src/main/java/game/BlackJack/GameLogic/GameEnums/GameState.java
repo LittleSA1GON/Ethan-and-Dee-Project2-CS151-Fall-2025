@@ -1,5 +1,5 @@
 package game.BlackJack.GameLogic.GameEnums;
 
 public enum GameState {
-    NEW_GAME, IN_PROGRESS, COMPLETED, GAME_END
+    NEW_ROUND, PLAYER_TURN, DEALER_TURN, ROUND_OVER
 }
