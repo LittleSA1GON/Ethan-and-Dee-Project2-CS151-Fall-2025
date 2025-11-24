@@ -1,4 +1,4 @@
-package game.GameManager;
+package game.gamemanager;
 public class placeholder {
     
 }
