@@ -12,16 +12,19 @@ public abstract class Player {
     protected int betAmount;
     protected int money = 1000;
     protected boolean isBankrupt = false;
+    protected boolean hasStood = false;
+    protected boolean hasBusted = false;
 
     public void resetHand() {
         hand.clear();
         currScore = 0;
         betAmount = 0;
     }
-    public void receiveCard(Card card) {
-        hand.add(card);
-        updateScore();
-    }
+
+    abstract void hit();
+
+    abstract void stand();
+    
     public void updateScore() {
         if (pizzaBlackJack()) {
             currScore = 21;
@@ -88,9 +91,7 @@ public abstract class Player {
     }
     
 
-    abstract void hit();
 
-    abstract void stand();
     
     public String getUsername(){
         return this.username;

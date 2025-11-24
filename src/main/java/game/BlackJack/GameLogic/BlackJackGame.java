@@ -41,9 +41,4 @@ public class BlackJackGame {
             System.out.println(card);
         }
     }
-    public static void main(String[] args) {
-        BlackJackGame game = new BlackJackGame();
-        game.readDeck();
-    }
-
 }
