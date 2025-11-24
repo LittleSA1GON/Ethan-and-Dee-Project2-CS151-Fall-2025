@@ -30,6 +30,7 @@ public class SnakeGame {
     private Random random = new Random(); 
     private List<SnakeBody> snake = new ArrayList<>();
     private Direction currDirection = Direction.RIGHT;
+    private Food food;
 
     /*
      * TODO: Paste the ToolBar logic + UI and add it to the root (VBox)
@@ -87,25 +88,23 @@ public class SnakeGame {
         return vBox;
     }//end of constructRoot
 
-    private Food createFood(){ 
+    private void createFood(){ 
         int[] rowColPair = new int [2];
 
         int row = random.nextInt(16 - 2); //subtract available pixel coordinates - 2 to avoid displaying food on the border
         int col = random.nextInt(25 - 2); 
 
         FoodType randomFoodType = FoodType.values()[random.nextInt(FoodType.values().length)];
-        Food food = new Food(randomFoodType, row, col);
-        
-        return food;
+        this.food = new Food(randomFoodType, row, col);
     }//end of createFood
 
-    public void renderFood(Food food){
+    public void renderFood(){
         double cellSizeTimes = 1.5; //make food a bit bigger
 
-        int y = food.getRow() * CELL_SIZE; //convert food position from grid coordinates to pixel
-        int x = food.getColumn() * CELL_SIZE;
+        int y = this.food.getRow() * CELL_SIZE; //convert food position from grid coordinates to pixel
+        int x = this.food.getColumn() * CELL_SIZE;
 
-        gc.drawImage(food.getFoodType().getImage(), x, y, CELL_SIZE * cellSizeTimes, CELL_SIZE * cellSizeTimes);
+        gc.drawImage(this.food.getFoodType().getImage(), x, y, CELL_SIZE * cellSizeTimes, CELL_SIZE * cellSizeTimes);
     }//end of renderFood
 
     public void initSnake(){
@@ -147,7 +146,6 @@ public class SnakeGame {
         else { //currDirection and newDirection are perpendicular (valid move: perpendicular direction) 
             moveSnakePerpendicular(head, newDirection);
         } 
-        
     }//end of moveSnake
 
     public boolean isOppositeDirection(Direction newDirection){ 
@@ -163,8 +161,8 @@ public class SnakeGame {
         SnakeBody newHead;
 
         switch(currDirection){
-            case UP -> newHeadRow++;
-            case DOWN -> newHeadRow--;
+            case UP -> newHeadRow--;
+            case DOWN -> newHeadRow++;
             case RIGHT -> newHeadCol++;
             case LEFT -> newHeadCol--;
         }
@@ -212,9 +210,22 @@ public class SnakeGame {
         int row = newPart.getRow();
         int col = newPart.getCol();
 
-        for(SnakeBody self : snake){
-            if(self.getRow() == row && self.getCol() == col) { return true; }
+        for(int i = 0; i < snake.size(); i++){ 
+            if((i == snake.size() - 1) && !isEating(row, col)){ //if the snake don't eat any food at the newHead position, the prev tail will be removed (the snake is not growing)
+                break;
+            }
+
+            SnakeBody self = snake.get(i);
+            if(self.getRow() == row && self.getCol() == col) { 
+                return true; 
+            }
         }
+
+        return false;
+    }
+
+    public boolean isEating(int row, int col){
+        if(row == this.food.getRow() && col == this.food.getColumn()){ return true; }
         return false;
     }
 
@@ -234,8 +245,8 @@ public class SnakeGame {
     }
 
     public void startGame(){
-        Food currFood = createFood();
-        renderFood(currFood);
+        createFood();
+        renderFood();
     }
 
 
