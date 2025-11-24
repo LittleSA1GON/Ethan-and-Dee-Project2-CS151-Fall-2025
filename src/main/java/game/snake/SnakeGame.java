@@ -119,21 +119,6 @@ public class SnakeGame {
         }
     }//end of initSnake
 
-    public void addSnakeBodyPart(){ //eat
-
-        SnakeBody tail = snake.get(snake.size() - 1);
-        int lastRow = tail.getRow();
-        int lastCol = tail.getCol();
-
-        int addRow;
-        int addCol;
-        
-        switch(currDirection) {
-            case UP: addRow = lastRow - 1;
-            case DOWN: //TODO: continure here 
-        }
-    } //end of add snake body part
-
     public void moveSnake(Direction newDirection){
         SnakeBody head = snake.get(0);
 
@@ -236,8 +221,10 @@ public class SnakeGame {
     public void updateSnakeArrayList(SnakeBody newPart){
         if(!collide(newPart)){
             snake.add(0, newPart);
-            //TODO: check if the newHead eats a food, in that case, keep the tail 
-            snake.remove(snake.size() - 1);
+            
+            if(!isEating(newPart.getRow(), newPart.getCol())){ //check if the newHead eats a food, in that case, keep the tail, and vice versa
+                snake.remove(snake.size() - 1); //normal move, no growth
+            }
         }
         else{
             //TODO: Collision occurs, handle GameOver here
