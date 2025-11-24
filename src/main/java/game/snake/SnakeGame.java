@@ -29,6 +29,7 @@ public class SnakeGame {
     private int[][] gridCanvas; 
     private Random random = new Random(); 
     private List<SnakeBody> snake = new ArrayList<>();
+    private Direction currDirection = Direction.RIGHT;
 
     /*
      * TODO: Paste the ToolBar logic + UI and add it to the root (VBox)
@@ -99,18 +100,15 @@ public class SnakeGame {
     }//end of createFood
 
     public void renderFood(Food food){
-        //convert food position from grid coordinates to pixel
+        double cellSizeTimes = 1.5; //make food a bit bigger
 
-        double cellSizeTimes = 1.5;
-
-        int y = food.getRow() * CELL_SIZE; //
+        int y = food.getRow() * CELL_SIZE; //convert food position from grid coordinates to pixel
         int x = food.getColumn() * CELL_SIZE;
 
         gc.drawImage(food.getFoodType().getImage(), x, y, CELL_SIZE * cellSizeTimes, CELL_SIZE * cellSizeTimes);
     }//end of renderFood
 
     public void initSnake(){
-
         int startRow = 8;
         int startCol = 12;
 
@@ -122,11 +120,117 @@ public class SnakeGame {
         }
     }//end of initSnake
 
-    public void addSnakeBodyPart(){
+    public void addSnakeBodyPart(){ //eat
 
         SnakeBody tail = snake.get(snake.size() - 1);
-        //TODO: Continue here
+        int lastRow = tail.getRow();
+        int lastCol = tail.getCol();
 
+        int addRow;
+        int addCol;
+        
+        switch(currDirection) {
+            case UP: addRow = lastRow - 1;
+            case DOWN: //TODO: continure here 
+        }
+    } //end of add snake body part
+
+    public void moveSnake(Direction newDirection){
+        SnakeBody head = snake.get(0);
+
+        if(currDirection == newDirection){ // keep moving straight 
+            moveSnakeStraight(head, newDirection);
+        } 
+        else if (isOppositeDirection(newDirection)){ // ignore the change: Snake can't reverse into itself
+            moveSnakeStraight(head, currDirection);  // keep moving in the currDirection
+        }
+        else { //currDirection and newDirection are perpendicular (valid move: perpendicular direction) 
+            moveSnakePerpendicular(head, newDirection);
+        } 
+        
+    }//end of moveSnake
+
+    public boolean isOppositeDirection(Direction newDirection){ 
+        return (currDirection == Direction.UP && newDirection == Direction.DOWN) || 
+        (currDirection == Direction.DOWN && newDirection == Direction.UP) || 
+        (currDirection == Direction.RIGHT && newDirection == Direction.LEFT) || 
+        (currDirection == Direction.LEFT && newDirection == Direction.RIGHT);
+    }
+
+    public void moveSnakeStraight(SnakeBody head, Direction currDirection){
+        int newHeadRow = head.getRow();
+        int newHeadCol = head.getCol();
+        SnakeBody newHead;
+
+        switch(currDirection){
+            case UP -> newHeadRow++;
+            case DOWN -> newHeadRow--;
+            case RIGHT -> newHeadCol++;
+            case LEFT -> newHeadCol--;
+        }
+
+        newHead = new SnakeBody(newHeadRow, newHeadCol);
+        updateSnakeArrayList(newHead);
+    }//end of moveSnakeStraight
+
+    public void moveSnakePerpendicular(SnakeBody head, Direction newDirection){
+        int newHeadRow = head.getRow();
+        int newHeadCol = head.getCol();
+        SnakeBody newHead;
+
+        if(currDirection == Direction.UP || currDirection == Direction.DOWN) { // UP -> LEFT/RIGHT and DOWN -> LEFT/RIGHT
+            switch(newDirection){
+                case LEFT -> newHeadCol--;
+                case RIGHT -> newHeadCol++;
+                default -> {}
+            }
+        } //end UP -> LEFT/RIGHT and DOWN -> LEFT/RIGHT
+
+        else if (currDirection == Direction.LEFT || currDirection == Direction.RIGHT){ //LEFT -> UP/DOWN and RIGHT -> UP/DOWN
+            switch(newDirection) {
+                case UP -> newHeadRow--;
+                case DOWN -> newHeadRow++;
+                default -> {} 
+            }
+        }//end LEFT -> UP/DOWN and RIGHT -> UP/DOWN
+
+        newHead = new SnakeBody(newHeadRow, newHeadCol);
+        updateSnakeArrayList(newHead);
+        this.currDirection = newDirection;
+    }// end of moveSnakePerpendicular
+
+    public boolean collideWithWall(SnakeBody newPart){
+        int row = newPart.getRow();
+        int col = newPart.getCol();
+
+        if(row < 1 || row > 14){ return true; }
+        if(col < 1 || col > 23){ return true; }
+        return false;
+    }
+
+    public boolean collideWithSelf(SnakeBody newPart){
+        int row = newPart.getRow();
+        int col = newPart.getCol();
+
+        for(SnakeBody self : snake){
+            if(self.getRow() == row && self.getCol() == col) { return true; }
+        }
+        return false;
+    }
+
+    public boolean collide(SnakeBody newPart){
+        return collideWithWall(newPart) || collideWithSelf(newPart);
+    }
+
+    public void updateSnakeArrayList(SnakeBody newPart){
+        if(!collide(newPart)){
+            snake.add(0, newPart);
+            //TODO: check if the newHead eats a food, in that case, keep the tail 
+            snake.remove(snake.size() - 1);
+        }
+        else{
+            //TODO: Collision occurs, handle GameOver here
+        }
     }
 
     public void startGame(){
