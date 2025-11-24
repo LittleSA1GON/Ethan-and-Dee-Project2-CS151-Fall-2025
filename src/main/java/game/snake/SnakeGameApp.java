@@ -10,6 +10,8 @@ public class SnakeGameApp extends Application{
     public void start(Stage primaryStage){
         
         SnakeGame snakeGame = new SnakeGame();
+        
+        snakeGame.startGame();
 
         Scene scene = new Scene(snakeGame.getRootNode(), 800, 600);
 
