@@ -30,7 +30,10 @@ public class SnakeGame {
     private int score = 0;
     private VBox root; //top = toolbar, right beneath the toolbar = score (Hbox), the rest = canvas
     private ToolBar toolBar;
+
     private HBox scoreHBox;
+    private HBox gameOverScoreHBox;
+
     private Canvas canvas;
     private GraphicsContext gc;
     private final int CELL_SIZE = 28; 
@@ -45,6 +48,8 @@ public class SnakeGame {
     private boolean playerHitFirstKey = false;
     private StackPane canvasHolderStackPane;
     private Button restartButton = new Button("Play Again");
+
+    
 
     private Image snakeHead = new Image("/game/snake/ChatGPTGeneratedSnakeHead.png");
     private Image arrowEmoji = new Image("/game/snake/ChatGPTGeneratedArrowKey.png");
@@ -78,42 +83,9 @@ public class SnakeGame {
         });
 
         restartButton.setOnAction(event -> {
-            //TODO
+            startGame();
         });
 
-        animationTimer = new AnimationTimer() {
-            
-            long lastFrameTimeStamp = 0; //in nanoseconds
-            long timeInterval = 0;
-
-            @Override
-            public void handle(long nowFrameTimeStamp){
-                if(isGameOver){
-                    return;
-                }
-    
-                renderSnake(); //render snake and food even when player hasn't started playing
-                renderFood();
-                if(!playerHitFirstKey){
-                    gc.drawImage(arrowEmoji, 500, 20, 200, 100);
-                }
-
-                if(playerHitFirstKey && lastFrameTimeStamp == 0){ //first frame: initialize clock //only start the game when player first pressed a valid arrow key
-                    lastFrameTimeStamp = nowFrameTimeStamp;
-                    return;
-                }
-
-                timeInterval = nowFrameTimeStamp - lastFrameTimeStamp;
-
-                if(timeInterval > 159_000_000){
-
-                    moveSnake(newDirection);
-
-                    if(isGameOver){ return; } 
-                    lastFrameTimeStamp = nowFrameTimeStamp;
-                }
-            }
-        };
     }//end of constructor
 
     private ToolBar initToolBar(){ //initializing ToolBar (update this after completing game manager)
@@ -156,6 +128,7 @@ public class SnakeGame {
         this.canvasHolderStackPane.setStyle("-fx-border-color: black; -fx-border-width: 10;"); //add visible border
         this.canvasHolderStackPane.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE); //FORCES StackPane not to stretch the canvas
         this.canvasHolderStackPane.setPadding(Insets.EMPTY);
+        this.canvasHolderStackPane.getChildren().add(restartButton);
        
         vBox.setAlignment(Pos.CENTER); 
         vBox.getChildren().addAll(this.toolBar, this.scoreHBox, canvasHolderStackPane);
@@ -362,42 +335,105 @@ public class SnakeGame {
         gc.clearRect(0,0, canvas.getWidth(), canvas.getHeight());
         gc.drawImage(gameOverImage, 0, 0, 700, 448);
 
-        HBox scoreHBox = new HBox(15);
-        scoreHBox.setPadding(new Insets(10));
-
         displayScoreOnGameOver();
 
     }
 
     public void displayScoreOnGameOver(){
+
+       
         Label yourScoreLabel = new Label("Your Score: ");
         yourScoreLabel.setStyle("-fx-font-size: 32px; -fx-font-weight: bold;");
         
         Label actualScoreLabel = new Label(String.valueOf(score));
         actualScoreLabel.setStyle("-fx-font-size: 32px; -fx-font-weight: bold;");
 
-        HBox scoreHBox = new HBox(15);
-        scoreHBox.setPadding(new Insets(10));
-        scoreHBox.setMaxWidth(Region.USE_PREF_SIZE); //to avoid HBox stretching/interfering with Pos
-        scoreHBox.getChildren().addAll(yourScoreLabel, actualScoreLabel);
+        gameOverScoreHBox = new HBox(15);
+        gameOverScoreHBox.setPadding(new Insets(10));
+        gameOverScoreHBox.setMaxWidth(Region.USE_PREF_SIZE); //to avoid HBox stretching/interfering with Pos
+        gameOverScoreHBox.getChildren().addAll(yourScoreLabel, actualScoreLabel);
+        
 
-        StackPane.setAlignment(scoreHBox, Pos.TOP_CENTER);
-        StackPane.setMargin(scoreHBox, new Insets(220, 0, 0, 0));
+        StackPane.setAlignment(gameOverScoreHBox, Pos.TOP_CENTER);
+        StackPane.setMargin(gameOverScoreHBox, new Insets(220, 0, 0, 0));
 
         StackPane.setAlignment(restartButton, Pos.TOP_CENTER);
         StackPane.setMargin(restartButton, new Insets(300, 0, 0, 0));
 
-        restartButton.setVisible(true);
+     
         restartButton.setStyle("-fx-background-color: slateblue; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 10 20;");
 
-        canvasHolderStackPane.getChildren().addAll(scoreHBox, restartButton);
+        canvasHolderStackPane.getChildren().add(gameOverScoreHBox);
+
+        gameOverScoreHBox.setVisible(true);
+        restartButton.setVisible(true);
+
+        gameOverScoreHBox.setMouseTransparent(true); //scoreHBox don't consume mouse events
     }
+    
 
     public void startGame(){
+
+
+        //reset states
+        //clear the canvas
+        gc.clearRect(0,0, canvas.getWidth(), canvas.getHeight());
+        if(this.animationTimer != null) {
+            this.animationTimer.stop(); 
+        }
+        if(gameOverScoreHBox != null){
+            this.gameOverScoreHBox.setVisible(false);
+        }
+        isGameOver = false;
+        playerHitFirstKey = false;
+        currDirection = Direction.RIGHT;
+        newDirection = Direction.RIGHT;
+        restartButton.setVisible(false);
+        this.score = 0;
+        snake.clear();
+        
+
+        //initialize
         initSnake();
         createFood();
+        
+        animationTimer = new AnimationTimer() {
+            
+            long lastFrameTimeStamp = 0; //in nanoseconds
+            long timeInterval = 0;
+
+            @Override
+            public void handle(long nowFrameTimeStamp){
+                if(isGameOver){
+                    return;
+                }
+    
+                renderSnake(); //render snake and food even when player hasn't started playing
+                renderFood();
+                if(!playerHitFirstKey){
+                    gc.drawImage(arrowEmoji, 500, 20, 200, 100);
+                    return;
+                }
+
+                if(playerHitFirstKey && lastFrameTimeStamp == 0){ //first frame: initialize clock //only start the game when player first pressed a valid arrow key
+                    lastFrameTimeStamp = nowFrameTimeStamp;
+                    return;
+                }
+
+                timeInterval = nowFrameTimeStamp - lastFrameTimeStamp;
+
+                if(timeInterval > 159_000_000){
+
+                    moveSnake(newDirection);
+
+                    if(isGameOver){ return; } 
+                    lastFrameTimeStamp = nowFrameTimeStamp;
+                }
+            }
+        };
         this.animationTimer.start(); //start the loop
-    }
+        root.requestFocus();
+    }//end of startGame()
 
     public VBox getRootNode(){ return this.root; }
 
