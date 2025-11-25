@@ -206,7 +206,16 @@ public class SnakeGame {
             y = part.getRow() * CELL_SIZE;
 
             if(i == 0){
-                gc.drawImage(snakeHead, x, y, CELL_SIZE, CELL_SIZE);
+                gc.save(); //store the current, normal orientation
+                gc.translate(x + CELL_SIZE/2.0, y + CELL_SIZE/2.0); //move pibot to the center of the cell //to rotate around the head's center (not the whole canvas)
+                switch(currDirection){ //apply rotation 
+                    case RIGHT -> {} //align with the given snakehead image
+                    case DOWN -> gc.rotate(90);
+                    case LEFT -> gc.scale(-1,1); //flip the right-headed snakehead horizontally 
+                    case UP -> gc.rotate(270);
+                }
+                gc.drawImage(snakeHead, -CELL_SIZE / 2.0, -CELL_SIZE / 2.0, CELL_SIZE, CELL_SIZE); //draw the snakeHead centered at the pivot
+                gc.restore(); //returns everything to normal after drawing the rotated head 
             }
             else{
                 gc.setFill(Color.GREEN);
@@ -217,17 +226,23 @@ public class SnakeGame {
     }//end of renderSnake()
 
     public void initSnake(){
-        int startRow = 8;
-        int startCol = 12;
+        int startRow = 4 + random.nextInt(8); //snake start square near the center of the map
+        int startCol = 3 + random.nextInt(13);
 
-        SnakeBody head = new SnakeBody(startRow, startCol--);
+        //snake.clear();
+
+        SnakeBody head = new SnakeBody(startRow, startCol);
         snake.add(head);
 
         for(int i = 0; i < 2; i++){
-            snake.add(new SnakeBody(startRow, startCol--));
+            switch(currDirection){
+                case UP -> startRow++;
+                case DOWN -> startRow--;
+                case RIGHT -> startCol--;
+                case LEFT -> startCol++;
+            }
+            snake.add(new SnakeBody(startRow, startCol));
         }
-
-        
     }//end of initSnake
 
     public void moveSnake(Direction newDirection){
@@ -416,8 +431,8 @@ public class SnakeGame {
         }
         isGameOver = false;
         playerHitFirstKey = false;
-        currDirection = Direction.RIGHT;
-        newDirection = Direction.RIGHT;
+        currDirection = Direction.getRandomDirection(random);
+        newDirection = currDirection;
         restartButton.setVisible(false);
         this.score = 0; //TODO: the score should be checked against all 5 highest score for this user and update if higher
         snake.clear();
