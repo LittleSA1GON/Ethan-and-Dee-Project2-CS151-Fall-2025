@@ -22,6 +22,7 @@ import javafx.scene.paint.Color;
 public class SnakeGame {
 
     private Label currScoreLabel = new Label(); //restart from 0 everytime game restarts -->use currScoreLabel.setText(String.valueOf(newScore)); to update it with real time
+    private int score = 0;
     private VBox root; //top = toolbar, right beneath the toolbar = score (Hbox), the rest = canvas
     private ToolBar toolBar;
     private HBox scoreHBox;
@@ -44,7 +45,34 @@ public class SnakeGame {
         this.scoreHBox = initScoreHBox();
         this.canvas = constructCanvas(); //assuming we let Stage Size be 800 x 600
         this.root = constructRoot();
-        
+        animationTimer = new AnimationTimer() {
+            
+            long lastFrameTimeStamp = 0; //in nanoseconds
+            long timeInterval = 0;
+
+            @Override
+            public void handle(long nowFrameTimeStamp){
+                
+                if(lastFrameTimeStamp == 0){ //first frame: initialize clock
+                    lastFrameTimeStamp = nowFrameTimeStamp;
+                    renderSnake();
+                    renderFood();
+                    return;
+                }
+
+                timeInterval = nowFrameTimeStamp - lastFrameTimeStamp;
+
+                if(timeInterval > 155_000_000){
+
+                    moveSnake(Direction.RIGHT);
+                    //movement
+
+                    renderSnake();
+                    renderFood();
+                    lastFrameTimeStamp = nowFrameTimeStamp;
+                }
+            }
+        };
     }//end of constructor
 
     private ToolBar initToolBar(){ //initializing ToolBar (update this after completing game manager)
@@ -60,7 +88,7 @@ public class SnakeGame {
          hBox.setAlignment(Pos.TOP_RIGHT);
 
          Label scoreLabel = new Label("Score: ");
-         currScoreLabel.setText(String.valueOf(0));
+         currScoreLabel.setText(String.valueOf(score));
          hBox.getChildren().addAll(scoreLabel, currScoreLabel);
          return hBox;
     } //end of initScoreHBox
@@ -260,19 +288,27 @@ public class SnakeGame {
             if(!isEating(newPart.getRow(), newPart.getCol())){ //check if the newHead eats a food, in that case, keep the tail, and vice versa
                 snake.remove(snake.size() - 1); //normal move, no growth
             }
+            else{ //food is eaten, keep the previous tail
+                foodIsEaten();
+            }
         }
         else{
             //TODO: Collision occurs, handle GameOver here
         }
     }
 
+    public void foodIsEaten(){
+        this.score++;
+        currScoreLabel.setText(String.valueOf(this.score));
+        createFood();
+
+    }
+
     public void startGame(){
         initSnake();
         createFood();
-        renderSnake();
-        renderFood();
+        this.animationTimer.start(); //start the loop
     }
-
 
     public VBox getRootNode(){ return this.root; }
 
