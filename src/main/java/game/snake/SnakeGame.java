@@ -43,6 +43,8 @@ public class SnakeGame {
     private AnimationTimer animationTimer;
     private boolean isGameOver = false;
     private boolean playerHitFirstKey = false;
+    private StackPane canvasHolderStackPane;
+    private Button restartButton = new Button("Play Again");
 
     private Image snakeHead = new Image("/game/snake/ChatGPTGeneratedSnakeHead.png");
     private Image arrowEmoji = new Image("/game/snake/ChatGPTGeneratedArrowKey.png");
@@ -54,8 +56,10 @@ public class SnakeGame {
     public SnakeGame(){ 
         this.toolBar = initToolBar(); //incorporating abstraction everywhere possible to make code readable
         this.scoreHBox = initScoreHBox();
-        this.canvas = constructCanvas(); //assuming we let Stage Size be 800 x 600
+        this.canvas = constructCanvas(); 
         this.root = constructRoot();
+        restartButton.setVisible(false);
+
         root.setOnKeyPressed(event -> {
 
             KeyCode keyCode = event.getCode();
@@ -71,6 +75,10 @@ public class SnakeGame {
                 case KeyCode.ESCAPE -> {} //TODO: handle Pause Screen}
                 default -> {}   
             }
+        });
+
+        restartButton.setOnAction(event -> {
+            //TODO
         });
 
         animationTimer = new AnimationTimer() {
@@ -117,10 +125,12 @@ public class SnakeGame {
 
     private HBox initScoreHBox(){
          HBox hBox = new HBox(15);
-         hBox.setPadding(new Insets(10));
+         hBox.setPadding(new Insets(20));
          hBox.setAlignment(Pos.TOP_RIGHT);
 
          Label scoreLabel = new Label("Score: ");
+         scoreLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+         currScoreLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
          currScoreLabel.setText(String.valueOf(score));
          hBox.getChildren().addAll(scoreLabel, currScoreLabel);
          return hBox;
@@ -142,10 +152,10 @@ public class SnakeGame {
         VBox vBox = new VBox(10);
         vBox.setPadding(new Insets(15));
 
-        StackPane canvasHolderStackPane = new StackPane(canvas);
-        canvasHolderStackPane.setStyle("-fx-border-color: black; -fx-border-width: 10;"); //add visible border
-        canvasHolderStackPane.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE); //FORCES StackPane not to stretch the canvas
-        canvasHolderStackPane.setPadding(Insets.EMPTY);
+        this.canvasHolderStackPane = new StackPane(canvas);
+        this.canvasHolderStackPane.setStyle("-fx-border-color: black; -fx-border-width: 10;"); //add visible border
+        this.canvasHolderStackPane.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE); //FORCES StackPane not to stretch the canvas
+        this.canvasHolderStackPane.setPadding(Insets.EMPTY);
        
         vBox.setAlignment(Pos.CENTER); 
         vBox.getChildren().addAll(this.toolBar, this.scoreHBox, canvasHolderStackPane);
@@ -351,6 +361,36 @@ public class SnakeGame {
         this.isGameOver = true;
         gc.clearRect(0,0, canvas.getWidth(), canvas.getHeight());
         gc.drawImage(gameOverImage, 0, 0, 700, 448);
+
+        HBox scoreHBox = new HBox(15);
+        scoreHBox.setPadding(new Insets(10));
+
+        displayScoreOnGameOver();
+
+    }
+
+    public void displayScoreOnGameOver(){
+        Label yourScoreLabel = new Label("Your Score: ");
+        yourScoreLabel.setStyle("-fx-font-size: 32px; -fx-font-weight: bold;");
+        
+        Label actualScoreLabel = new Label(String.valueOf(score));
+        actualScoreLabel.setStyle("-fx-font-size: 32px; -fx-font-weight: bold;");
+
+        HBox scoreHBox = new HBox(15);
+        scoreHBox.setPadding(new Insets(10));
+        scoreHBox.setMaxWidth(Region.USE_PREF_SIZE); //to avoid HBox stretching/interfering with Pos
+        scoreHBox.getChildren().addAll(yourScoreLabel, actualScoreLabel);
+
+        StackPane.setAlignment(scoreHBox, Pos.TOP_CENTER);
+        StackPane.setMargin(scoreHBox, new Insets(220, 0, 0, 0));
+
+        StackPane.setAlignment(restartButton, Pos.TOP_CENTER);
+        StackPane.setMargin(restartButton, new Insets(300, 0, 0, 0));
+
+        restartButton.setVisible(true);
+        restartButton.setStyle("-fx-background-color: slateblue; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 10 20;");
+
+        canvasHolderStackPane.getChildren().addAll(scoreHBox, restartButton);
     }
 
     public void startGame(){
