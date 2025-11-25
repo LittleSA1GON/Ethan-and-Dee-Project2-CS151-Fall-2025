@@ -37,6 +37,7 @@ public class SnakeGame {
     private Direction newDirection;
     private Food food;
     private Image snakeHead = new Image("/game/snake/ChatGPTGeneratedSnakeHead.png");
+    private Image arrowEmoji = new Image("/game/snake/ChatGPTGeneratedArrowKey.png");
     private AnimationTimer animationTimer;
     private boolean isGameOver = false;
     private boolean playerHitFirstKey = false;
@@ -73,6 +74,9 @@ public class SnakeGame {
     
                 renderSnake();
                 renderFood();
+                if(!playerHitFirstKey){
+                    gc.drawImage(arrowEmoji, 500, 20, 200, 100);
+                }
 
                 if(playerHitFirstKey && lastFrameTimeStamp == 0){ //first frame: initialize clock //only start the game when player first pressed a valid arrow key
                     lastFrameTimeStamp = nowFrameTimeStamp;
