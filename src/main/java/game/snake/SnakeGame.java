@@ -36,6 +36,7 @@ public class SnakeGame {
     private Food food;
     private Image snakeHead = new Image("/game/snake/ChatGPTGeneratedSnakeHead.png");
     private AnimationTimer animationTimer;
+    private boolean isGameOver = false;
     /*
      * TODO: Paste the ToolBar logic + UI and add it to the root (VBox)
      */
@@ -52,6 +53,10 @@ public class SnakeGame {
 
             @Override
             public void handle(long nowFrameTimeStamp){
+
+                if(isGameOver){
+                    return;
+                }
                 
                 if(lastFrameTimeStamp == 0){ //first frame: initialize clock
                     lastFrameTimeStamp = nowFrameTimeStamp;
@@ -66,6 +71,7 @@ public class SnakeGame {
 
                     moveSnake(Direction.RIGHT);
                     //movement
+                    if(isGameOver){ return; }
 
                     renderSnake();
                     renderFood();
@@ -289,19 +295,29 @@ public class SnakeGame {
                 snake.remove(snake.size() - 1); //normal move, no growth
             }
             else{ //food is eaten, keep the previous tail
-                foodIsEaten();
+                updateStateSinceFoodIsEaten();
             }
         }
         else{
             //TODO: Collision occurs, handle GameOver here
+            gameOver();
         }
-    }
+    }//end of updateSnakeArrayList
 
-    public void foodIsEaten(){
+    public void updateStateSinceFoodIsEaten(){
         this.score++;
         currScoreLabel.setText(String.valueOf(this.score));
         createFood();
+    }
 
+    public void gameOver(){
+        this.animationTimer.stop();
+        gc.clearRect(0,0, canvas.getWidth(), canvas.getHeight());
+        gc.setFill(Color.RED);
+        gc.fillRect(0,0, this.canvas.getWidth(), this.canvas.getHeight());
+        gc.setFill(Color.BLACK);
+        gc.fillText("Game Over", 300, 300);
+        this.isGameOver = true;
     }
 
     public void startGame(){
