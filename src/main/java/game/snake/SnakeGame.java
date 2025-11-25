@@ -16,9 +16,13 @@ import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
 public class SnakeGame {
 
@@ -36,11 +40,13 @@ public class SnakeGame {
     private Direction currDirection = Direction.RIGHT;
     private Direction newDirection;
     private Food food;
-    private Image snakeHead = new Image("/game/snake/ChatGPTGeneratedSnakeHead.png");
-    private Image arrowEmoji = new Image("/game/snake/ChatGPTGeneratedArrowKey.png");
     private AnimationTimer animationTimer;
     private boolean isGameOver = false;
     private boolean playerHitFirstKey = false;
+
+    private Image snakeHead = new Image("/game/snake/ChatGPTGeneratedSnakeHead.png");
+    private Image arrowEmoji = new Image("/game/snake/ChatGPTGeneratedArrowKey.png");
+    private Image gameOverImage = new Image("/game/snake/ChatGPTGeneratedGameOver.png");
     /*
      * TODO: Paste the ToolBar logic + UI and add it to the root (VBox)
      */
@@ -51,14 +57,20 @@ public class SnakeGame {
         this.canvas = constructCanvas(); //assuming we let Stage Size be 800 x 600
         this.root = constructRoot();
         root.setOnKeyPressed(event -> {
-            switch(event.getCode()){
+
+            KeyCode keyCode = event.getCode();
+            
+            if(keyCode.isArrowKey()){
+                playerHitFirstKey = true;
+            }
+            switch(keyCode){
                 case KeyCode.UP -> newDirection = Direction.UP;
                 case KeyCode.DOWN -> newDirection = Direction.DOWN;
                 case KeyCode.RIGHT -> newDirection = Direction.RIGHT;
                 case KeyCode.LEFT -> newDirection = Direction.LEFT;
-                //TODO: handle ESCAPE logic
+                case KeyCode.ESCAPE -> {} //TODO: handle Pause Screen}
+                default -> {}   
             }
-            playerHitFirstKey = true;
         });
 
         animationTimer = new AnimationTimer() {
@@ -72,7 +84,7 @@ public class SnakeGame {
                     return;
                 }
     
-                renderSnake();
+                renderSnake(); //render snake and food even when player hasn't started playing
                 renderFood();
                 if(!playerHitFirstKey){
                     gc.drawImage(arrowEmoji, 500, 20, 200, 100);
@@ -95,8 +107,6 @@ public class SnakeGame {
             }
         };
     }//end of constructor
-
-
 
     private ToolBar initToolBar(){ //initializing ToolBar (update this after completing game manager)
         return new ToolBar(
@@ -125,10 +135,6 @@ public class SnakeGame {
         gc.setFill(Color.web("#FADA5E"));
         gc.fillRect(0, 0, canvasL.getWidth(), canvasL.getHeight());
 
-        //set visible border
-        gc.setLineWidth(10); 
-        gc.strokeRect(5, 5, canvasL.getWidth() - 10, canvasL.getHeight() - 10);
-
         return canvasL;
     }//end of constructCanvas
 
@@ -136,25 +142,39 @@ public class SnakeGame {
         VBox vBox = new VBox(10);
         vBox.setPadding(new Insets(15));
 
-        StackPane canvasHolderPane = new StackPane(canvas);
-        canvasHolderPane.setAlignment(Pos.CENTER);
-
-        vBox.getChildren().addAll(this.toolBar, this.scoreHBox, canvasHolderPane);
+        StackPane canvasHolderStackPane = new StackPane(canvas);
+        canvasHolderStackPane.setStyle("-fx-border-color: black; -fx-border-width: 10;"); //add visible border
+        canvasHolderStackPane.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE); //FORCES StackPane not to stretch the canvas
+        canvasHolderStackPane.setPadding(Insets.EMPTY);
+       
+        vBox.setAlignment(Pos.CENTER); 
+        vBox.getChildren().addAll(this.toolBar, this.scoreHBox, canvasHolderStackPane);
         return vBox;
     }//end of constructRoot
 
     private void createFood(){ 
-        int[] rowColPair = new int [2];
-
-        int row = random.nextInt(16 - 2); //subtract available pixel coordinates - 2 to avoid displaying food on the border
-        int col = random.nextInt(25 - 2); 
+        int row = 1 + random.nextInt(16 - 2); //subtract available pixel coordinates - 2 to avoid displaying food on the border
+        int col = 1 + random.nextInt(25 - 2); 
 
         FoodType randomFoodType = FoodType.values()[random.nextInt(FoodType.values().length)];
         this.food = new Food(randomFoodType, row, col);
     }//end of createFood
 
+    public void renderLines(){
+
+        gc.setStroke(Color.GRAY);
+        gc.setLineWidth(1);
+
+        for(int row = 0; row < 23; row++){
+            this.gc.strokeLine(0, row * CELL_SIZE, 720, row * CELL_SIZE);//syntax: gc.strokeLine(x1, y1, x2, y2);
+        }
+        for(int col = 0; col < 36; col++){
+            this.gc.strokeLine(col * CELL_SIZE, 0, col * CELL_SIZE, 460);
+        }
+    }
+
     public void renderFood(){
-        double cellSizeTimes = 1.5; //make food a bit bigger
+        double cellSizeTimes = 1.2; //make food a bit bigger
 
         int y = this.food.getRow() * CELL_SIZE; //convert food position from grid coordinates to pixel
         int x = this.food.getColumn() * CELL_SIZE;
@@ -170,9 +190,7 @@ public class SnakeGame {
         gc.setFill(Color.web("#FADA5E"));
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-        //set visible border
-        gc.setLineWidth(10); 
-        gc.strokeRect(5, 5, canvas.getWidth() - 10, canvas.getHeight() - 10);
+        renderLines();
 
         for(int i = 0; i < snake.size(); i++){
 
@@ -330,12 +348,9 @@ public class SnakeGame {
 
     public void gameOver(){
         this.animationTimer.stop();
-        gc.clearRect(0,0, canvas.getWidth(), canvas.getHeight());
-        gc.setFill(Color.RED);
-        gc.fillRect(0,0, this.canvas.getWidth(), this.canvas.getHeight());
-        gc.setFill(Color.BLACK);
-        gc.fillText("Game Over", 300, 300);
         this.isGameOver = true;
+        gc.clearRect(0,0, canvas.getWidth(), canvas.getHeight());
+        gc.drawImage(gameOverImage, 0, 0, 700, 448);
     }
 
     public void startGame(){
