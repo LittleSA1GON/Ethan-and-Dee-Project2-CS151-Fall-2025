@@ -172,10 +172,10 @@ public class SnakeGame {
         gc.setStroke(Color.GRAY);
         gc.setLineWidth(1);
 
-        for(int row = 0; row < 23; row++){
+        for(int row = 0; row < 16; row++){
             this.gc.strokeLine(0, row * CELL_SIZE, 720, row * CELL_SIZE);//syntax: gc.strokeLine(x1, y1, x2, y2);
         }
-        for(int col = 0; col < 36; col++){
+        for(int col = 0; col < 25; col++){
             this.gc.strokeLine(col * CELL_SIZE, 0, col * CELL_SIZE, 460);
         }
     }
