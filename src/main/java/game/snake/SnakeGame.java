@@ -13,6 +13,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -44,16 +45,23 @@ public class SnakeGame {
     private Direction newDirection;
     private Food food;
     private AnimationTimer animationTimer;
+
     private boolean isGameOver = false;
     private boolean playerHitFirstKey = false;
+    private boolean gamePaused = false;
+
     private StackPane canvasHolderStackPane;
     private Button restartButton = new Button("Play Again");
+    
 
     
 
     private Image snakeHead = new Image("/game/snake/ChatGPTGeneratedSnakeHead.png");
     private Image arrowEmoji = new Image("/game/snake/ChatGPTGeneratedArrowKey.png");
     private Image gameOverImage = new Image("/game/snake/ChatGPTGeneratedGameOver.png");
+
+    private Image gamePauseImage = new Image("/game/snake/ChatGPTGeneratedGamePause.png");
+    private ImageView pauseOverlay = new ImageView(gamePauseImage);
     /*
      * TODO: Paste the ToolBar logic + UI and add it to the root (VBox)
      */
@@ -64,6 +72,7 @@ public class SnakeGame {
         this.canvas = constructCanvas(); 
         this.root = constructRoot();
         restartButton.setVisible(false);
+        pauseOverlay.setVisible(false);
 
         root.setOnKeyPressed(event -> {
 
@@ -77,7 +86,16 @@ public class SnakeGame {
                 case KeyCode.DOWN -> newDirection = Direction.DOWN;
                 case KeyCode.RIGHT -> newDirection = Direction.RIGHT;
                 case KeyCode.LEFT -> newDirection = Direction.LEFT;
-                case KeyCode.ESCAPE -> {} //TODO: handle Pause Screen}
+                case KeyCode.ESCAPE -> {
+                    if(!gamePaused && playerHitFirstKey && !isGameOver){
+                        pauseGame();
+                    }
+                    else{
+                        animationTimer.start();
+                        gamePaused = false;
+                        pauseOverlay.setVisible(false);
+                    }
+                } 
                 default -> {}   
             }
         });
@@ -128,7 +146,13 @@ public class SnakeGame {
         this.canvasHolderStackPane.setStyle("-fx-border-color: black; -fx-border-width: 10;"); //add visible border
         this.canvasHolderStackPane.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE); //FORCES StackPane not to stretch the canvas
         this.canvasHolderStackPane.setPadding(Insets.EMPTY);
-        this.canvasHolderStackPane.getChildren().add(restartButton);
+        this.canvasHolderStackPane.getChildren().addAll(restartButton, pauseOverlay);
+
+        pauseOverlay.setManaged(false);
+        pauseOverlay.setFitWidth(720);
+        pauseOverlay.setFitHeight(460);
+        pauseOverlay.setPreserveRatio(false);
+        
        
         vBox.setAlignment(Pos.CENTER); 
         vBox.getChildren().addAll(this.toolBar, this.scoreHBox, canvasHolderStackPane);
@@ -318,7 +342,7 @@ public class SnakeGame {
             this.currDirection = this.newDirection;
         }
         else{
-            //TODO: Collision occurs, handle GameOver here
+            //Collision occurs, handle GameOver here
             gameOver();
         }
     }//end of updateSnakeArrayList
@@ -332,6 +356,8 @@ public class SnakeGame {
     public void gameOver(){
         this.animationTimer.stop();
         this.isGameOver = true;
+        gamePaused = false;
+        pauseOverlay.setVisible(false);
         gc.clearRect(0,0, canvas.getWidth(), canvas.getHeight());
         gc.drawImage(gameOverImage, 0, 0, 700, 448);
 
@@ -370,10 +396,14 @@ public class SnakeGame {
 
         gameOverScoreHBox.setMouseTransparent(true); //scoreHBox don't consume mouse events
     }
-    
+
+    public void pauseGame(){
+        gamePaused = true;
+        pauseOverlay.setVisible(true);
+        animationTimer.stop();
+    }
 
     public void startGame(){
-
 
         //reset states
         //clear the canvas

@@ -4,7 +4,7 @@ import javafx.scene.image.Image;
 
 public enum FoodType {
 
-    FISH_BONES("/game/snake/fish-bones.png", -5),
+    //FISH_BONES("/game/snake/fish-bones.png", -5),
     STRAWBERRY("/game/snake/strawberry.png", 1),
     ORANGE("/game/snake/orange.png", 2),
     RICE_BALL("/game/snake/rice-ball.png", 3),
