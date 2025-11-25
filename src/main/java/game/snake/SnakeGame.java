@@ -13,6 +13,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -33,10 +34,12 @@ public class SnakeGame {
     private Random random = new Random(); 
     private List<SnakeBody> snake = new ArrayList<>();
     private Direction currDirection = Direction.RIGHT;
+    private Direction newDirection;
     private Food food;
     private Image snakeHead = new Image("/game/snake/ChatGPTGeneratedSnakeHead.png");
     private AnimationTimer animationTimer;
     private boolean isGameOver = false;
+    private boolean playerHitFirstKey = false;
     /*
      * TODO: Paste the ToolBar logic + UI and add it to the root (VBox)
      */
@@ -46,6 +49,17 @@ public class SnakeGame {
         this.scoreHBox = initScoreHBox();
         this.canvas = constructCanvas(); //assuming we let Stage Size be 800 x 600
         this.root = constructRoot();
+        root.setOnKeyPressed(event -> {
+            switch(event.getCode()){
+                case KeyCode.UP -> newDirection = Direction.UP;
+                case KeyCode.DOWN -> newDirection = Direction.DOWN;
+                case KeyCode.RIGHT -> newDirection = Direction.RIGHT;
+                case KeyCode.LEFT -> newDirection = Direction.LEFT;
+                //TODO: handle ESCAPE logic
+            }
+            playerHitFirstKey = true;
+        });
+
         animationTimer = new AnimationTimer() {
             
             long lastFrameTimeStamp = 0; //in nanoseconds
@@ -53,33 +67,32 @@ public class SnakeGame {
 
             @Override
             public void handle(long nowFrameTimeStamp){
-
                 if(isGameOver){
                     return;
                 }
-                
-                if(lastFrameTimeStamp == 0){ //first frame: initialize clock
+    
+                renderSnake();
+                renderFood();
+
+                if(playerHitFirstKey && lastFrameTimeStamp == 0){ //first frame: initialize clock //only start the game when player first pressed a valid arrow key
                     lastFrameTimeStamp = nowFrameTimeStamp;
-                    renderSnake();
-                    renderFood();
                     return;
                 }
 
                 timeInterval = nowFrameTimeStamp - lastFrameTimeStamp;
 
-                if(timeInterval > 155_000_000){
+                if(timeInterval > 159_000_000){
 
-                    moveSnake(Direction.RIGHT);
-                    //movement
-                    if(isGameOver){ return; }
+                    moveSnake(newDirection);
 
-                    renderSnake();
-                    renderFood();
+                    if(isGameOver){ return; } 
                     lastFrameTimeStamp = nowFrameTimeStamp;
                 }
             }
         };
     }//end of constructor
+
+
 
     private ToolBar initToolBar(){ //initializing ToolBar (update this after completing game manager)
         return new ToolBar(
@@ -192,13 +205,14 @@ public class SnakeGame {
         SnakeBody head = snake.get(0);
 
         if(currDirection == newDirection){ // keep moving straight 
-            moveSnakeStraight(head, newDirection);
+            moveSnakeStraight(head);
         } 
         else if (isOppositeDirection(newDirection)){ // ignore the change: Snake can't reverse into itself
-            moveSnakeStraight(head, currDirection);  // keep moving in the currDirection
+            this.newDirection = this.currDirection; // keep moving in the currDirection
+            moveSnakeStraight(head);  
         }
         else { //currDirection and newDirection are perpendicular (valid move: perpendicular direction) 
-            moveSnakePerpendicular(head, newDirection);
+            moveSnakePerpendicular(head);
         } 
     }//end of moveSnake
 
@@ -209,7 +223,7 @@ public class SnakeGame {
         (currDirection == Direction.LEFT && newDirection == Direction.RIGHT);
     }
 
-    public void moveSnakeStraight(SnakeBody head, Direction currDirection){
+    public void moveSnakeStraight(SnakeBody head){
         int newHeadRow = head.getRow();
         int newHeadCol = head.getCol();
         SnakeBody newHead;
@@ -225,7 +239,7 @@ public class SnakeGame {
         updateSnakeArrayList(newHead);
     }//end of moveSnakeStraight
 
-    public void moveSnakePerpendicular(SnakeBody head, Direction newDirection){
+    public void moveSnakePerpendicular(SnakeBody head){
         int newHeadRow = head.getRow();
         int newHeadCol = head.getCol();
         SnakeBody newHead;
@@ -248,7 +262,6 @@ public class SnakeGame {
 
         newHead = new SnakeBody(newHeadRow, newHeadCol);
         updateSnakeArrayList(newHead);
-        this.currDirection = newDirection;
     }// end of moveSnakePerpendicular
 
     public boolean collideWithWall(SnakeBody newPart){
@@ -297,6 +310,7 @@ public class SnakeGame {
             else{ //food is eaten, keep the previous tail
                 updateStateSinceFoodIsEaten();
             }
+            this.currDirection = this.newDirection;
         }
         else{
             //TODO: Collision occurs, handle GameOver here

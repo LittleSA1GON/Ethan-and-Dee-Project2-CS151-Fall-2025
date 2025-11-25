@@ -18,6 +18,8 @@ public class SnakeGameApp extends Application{
         primaryStage.setTitle("Snake Game");
         primaryStage.setScene(scene);
         primaryStage.show();
+
+        snakeGame.getRootNode().requestFocus(); //give focus to snakeGame's rootnode to handle events on it
     }//end of start
 
     public static void main(String[] args){
