@@ -3,6 +3,8 @@ package game.snake;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import javafx.animation.AnimationTimer;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
@@ -31,7 +33,8 @@ public class SnakeGame {
     private List<SnakeBody> snake = new ArrayList<>();
     private Direction currDirection = Direction.RIGHT;
     private Food food;
-
+    private Image snakeHead = new Image("/game/snake/ChatGPTGeneratedSnakeHead.png");
+    private AnimationTimer animationTimer;
     /*
      * TODO: Paste the ToolBar logic + UI and add it to the root (VBox)
      */
@@ -41,6 +44,7 @@ public class SnakeGame {
         this.scoreHBox = initScoreHBox();
         this.canvas = constructCanvas(); //assuming we let Stage Size be 800 x 600
         this.root = constructRoot();
+        
     }//end of constructor
 
     private ToolBar initToolBar(){ //initializing ToolBar (update this after completing game manager)
@@ -107,6 +111,35 @@ public class SnakeGame {
         gc.drawImage(this.food.getFoodType().getImage(), x, y, CELL_SIZE * cellSizeTimes, CELL_SIZE * cellSizeTimes);
     }//end of renderFood
 
+    public void renderSnake(){
+
+        int x, y; //to convert grid coordinates to pixel
+
+        gc.clearRect(0,0, canvas.getWidth(), canvas.getHeight());
+        gc.setFill(Color.web("#FADA5E"));
+        gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
+        //set visible border
+        gc.setLineWidth(10); 
+        gc.strokeRect(5, 5, canvas.getWidth() - 10, canvas.getHeight() - 10);
+
+        for(int i = 0; i < snake.size(); i++){
+
+            SnakeBody part = snake.get(i);
+            x = part.getCol() * CELL_SIZE;
+            y = part.getRow() * CELL_SIZE;
+
+            if(i == 0){
+                gc.drawImage(snakeHead, x, y, CELL_SIZE, CELL_SIZE);
+            }
+            else{
+                gc.setFill(Color.GREEN);
+                gc.fillRoundRect(x+2, y+2, CELL_SIZE-4, CELL_SIZE-4, 10, 10); //Rounded green body segment (inset 2 pixel for smoothness and corner radius = 10)
+            }
+        }
+
+    }//end of renderSnake()
+
     public void initSnake(){
         int startRow = 8;
         int startCol = 12;
@@ -117,6 +150,8 @@ public class SnakeGame {
         for(int i = 0; i < 2; i++){
             snake.add(new SnakeBody(startRow, startCol--));
         }
+
+        
     }//end of initSnake
 
     public void moveSnake(Direction newDirection){
@@ -232,7 +267,9 @@ public class SnakeGame {
     }
 
     public void startGame(){
+        initSnake();
         createFood();
+        renderSnake();
         renderFood();
     }
 
