@@ -157,7 +157,7 @@ public class SnakeGame {
     }
 
     public void renderFood(){
-        double cellSizeTimes = 1.2; //make food a bit bigger
+        double cellSizeTimes = 1.3; //make food a bit bigger
 
         int y = this.food.getRow() * CELL_SIZE; //convert food position from grid coordinates to pixel
         int x = this.food.getColumn() * CELL_SIZE;
@@ -389,7 +389,7 @@ public class SnakeGame {
         currDirection = Direction.RIGHT;
         newDirection = Direction.RIGHT;
         restartButton.setVisible(false);
-        this.score = 0;
+        this.score = 0; //TODO: the score should be checked against all 5 highest score for this user and update if higher
         snake.clear();
         
 
