@@ -2,23 +2,47 @@ package game.gamemanager;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 public class GameManager extends Application{
+
+    private Stage primaryStage;
+    private Scene currScene;
     
     @Override
-    public void start(Stage primaryStage){
-        LoginScreen loginScreen = new LoginScreen();
+    public void start(Stage stage){
+        this.primaryStage = stage;
 
-        StackPane loginScreenRootNode = loginScreen.getRootNode();
-
-        Scene loginScene = new Scene(loginScreenRootNode, 800, 600);
-
+        FirstScreen firstScreen = new FirstScreen();
+        StackPane firstScreenRootNode = firstScreen.getRootNode();
+        
+        currScene = new Scene(firstScreenRootNode, 800, 600);
         primaryStage.setTitle("Welcome Page");
-        primaryStage.setScene(loginScene);
+        primaryStage.setScene(currScene);
+
+        attachListenersToFirstScreenButtons(firstScreen.getLoginButton(), firstScreen.getCreateAccountButton());
+
+       
+
+       
         primaryStage.show();
         
+    }
+
+    public void attachListenersToFirstScreenButtons(Button firstScreenLoginButton, Button firstScreenSignUpButton){
+       
+        firstScreenLoginButton.setOnAction(event -> {
+            createAndGoToLoginScreenScene();
+            this.primaryStage.setTitle("User Login");
+        });
+    }
+
+    public void createAndGoToLoginScreenScene(){
+        LoginScreen loginScreen = new LoginScreen();
+        StackPane loginScreenRootNode = loginScreen.getRootNode();
+        currScene.setRoot(loginScreenRootNode); //Not create a new scene but switch root
     }
 
     public static void main(String[] args){
