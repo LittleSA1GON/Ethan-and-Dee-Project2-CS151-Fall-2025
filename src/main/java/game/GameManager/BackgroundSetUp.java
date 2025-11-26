@@ -10,11 +10,12 @@ public abstract class BackgroundSetUp {
     protected StackPane rootStackPane;
     protected Pane backgroundPane;
     protected Pane dimOverlay;
+    //protected String oceanImgPathString = "/game/gamemanager/OceanAndIslandTemple:Net.png"; 
 
-    public void constructBackgroundPane(){
+    public void constructBackgroundPane(String oceanImgPathString){
         backgroundPane = new Pane();
         backgroundPane.setStyle(
-            "-fx-background-image: url('/game/gamemanager/OceanAndIslandTemple:Net.png');" + //loads the image
+            "-fx-background-image: url('" + oceanImgPathString + "');" + //loads the image
             "-fx-background-size: cover;" + //scales to fill the whole pane
             "-fx-background-position: center center;" //keeps the image center
         );
@@ -29,5 +30,7 @@ public abstract class BackgroundSetUp {
     }
     
     abstract void constructVBox();
+
+    abstract StackPane getRootNode();
 
 }

@@ -21,10 +21,12 @@ public class LoginScreen extends BackgroundSetUp {
     private String usernameString;
     private String pwdString;
 
+    String oceanImgPathString = "/game/gamemanager/OceanAndIslandTemple:Net.png";
+
     public LoginScreen(){
         rootStackPane = new StackPane();
         
-        constructBackgroundPane();
+        constructBackgroundPane(oceanImgPathString);
         constructDimAndBlurBackgroundImage();
        
         constructVBox();
@@ -45,7 +47,6 @@ public class LoginScreen extends BackgroundSetUp {
 
         Label pleaseLogin = new Label("Please Login");
         pleaseLogin.setStyle(
-            //"-fx-text-fill: ;" +
             "-fx-font-size: 20px"
         );
 
@@ -83,6 +84,7 @@ public class LoginScreen extends BackgroundSetUp {
 
     }
 
+    @Override
     public StackPane getRootNode(){
         return this.rootStackPane;
     }
