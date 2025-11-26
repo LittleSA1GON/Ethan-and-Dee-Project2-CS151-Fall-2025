@@ -1,9 +1,6 @@
 # Maven build output
 /target/
 
-# VSCode settings
-.vscode/
-
 # OS-specific
 .DS_Store
 
