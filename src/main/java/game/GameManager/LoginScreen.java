@@ -95,6 +95,7 @@ public class LoginScreen {
 
         loginVBox.getChildren().addAll(pleaseLogin, usernameTF, pwdTF, loginButton);
         
+        //TODO: attach listeners to both textFields and button 
     }
 
     public StackPane getRootNode(){
