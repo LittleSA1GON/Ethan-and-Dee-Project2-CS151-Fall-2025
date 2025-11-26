@@ -22,6 +22,9 @@ public class LoginScreen {
 
     private Button loginButton;
 
+    private String usernameString;
+    private String pwdString;
+
     public LoginScreen(){
         rootStackPane = new StackPane();
         
@@ -95,7 +98,14 @@ public class LoginScreen {
 
         loginVBox.getChildren().addAll(pleaseLogin, usernameTF, pwdTF, loginButton);
         
-        //TODO: attach listeners to both textFields and button 
+        //TODO: use usernameString and pwdString for backend logic
+        loginButton.setOnAction(event -> {
+            this.usernameString = usernameTF.getText();
+            this.pwdString = pwdTF.getText();
+
+            //TODO: handle validation for username and pwd with saved "user_accounts.txt" (also add encrytion for username and pwd in an extra text file)
+        });
+
     }
 
     public StackPane getRootNode(){
