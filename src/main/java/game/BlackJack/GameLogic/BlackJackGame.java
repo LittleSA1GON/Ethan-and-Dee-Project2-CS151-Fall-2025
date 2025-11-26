@@ -41,4 +41,10 @@ public class BlackJackGame {
             System.out.println(card);
         }
     }
+    public Card dealCard() {
+        if (shuffledDeck.isEmpty() || shuffledDeck.size() < 25) {
+            initializeDeck();
+        }
+        return shuffledDeck.pop();
+    }
 }
