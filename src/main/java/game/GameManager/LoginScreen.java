@@ -22,11 +22,12 @@ public class LoginScreen extends BackgroundSetUp {
     private String pwdString;
 
     String oceanImgPathString = "/game/gamemanager/OceanAndIslandTemple:Net.png";
+    String gamepadImgPathString ="/game/gamemanager/gamepad_bg_800x600.png";
 
     public LoginScreen(){
         rootStackPane = new StackPane();
         
-        constructBackgroundPane(oceanImgPathString);
+        constructBackgroundPane(gamepadImgPathString);
         constructDimAndBlurBackgroundImage();
        
         constructVBox();
