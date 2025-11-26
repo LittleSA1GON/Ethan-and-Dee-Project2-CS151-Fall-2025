@@ -5,7 +5,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
-public class GameManager extends javafx.application.Application{
+public class GameManager extends Application{
     
     @Override
     public void start(Stage primaryStage){
