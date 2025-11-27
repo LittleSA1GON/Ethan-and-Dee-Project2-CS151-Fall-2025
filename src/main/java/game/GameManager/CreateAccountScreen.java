@@ -93,7 +93,6 @@ public class CreateAccountScreen extends BackgroundSetUp{
         createAccountVBox.getChildren().addAll(pleaseSignUp, usernameTF, pwdTF, userDoesSomethingWrongLabel, createAccountButton);
 
         createAccountButton.setOnAction(event -> {
-
             this.usernameString = usernameTF.getText().trim();
             this.pwdString = pwdTF.getText().trim();
 
@@ -121,7 +120,7 @@ public class CreateAccountScreen extends BackgroundSetUp{
                 return;
             }
            
-
+            //if there were no errors along the way, this is the step to call loginScreen 
         });
 
     }

@@ -32,7 +32,6 @@ public class GameManager extends Application{
     }
 
     public void attachListenersToFirstScreenButtons(Button firstScreenLoginButton, Button firstScreenSignUpButton){
-
         firstScreenLoginButton.setOnAction(event -> {
             createAndGoToLoginScreenScene();
             this.primaryStage.setTitle("User Login");
