@@ -58,8 +58,9 @@ public class GameManager extends Application{
             loginScreen.addSuccessfulRegistrationToVBox(); //since user goes to the login page after successful registeration 
         }
         attachListenersToLoginScreenButton(loginScreen);
-        loginScreen.getSuccessfulLabel().setVisible(false);
-        loginScreen.getSuccessfulLabel().setManaged(false);
+        /* TODO: if have time, add 1 more boolean and if not the first time logging in after registering, turn the label off, not here */
+        //loginScreen.getSuccessfulLabel().setVisible(false);
+        //loginScreen.getSuccessfulLabel().setManaged(false);
         
     }
 
@@ -89,8 +90,6 @@ public class GameManager extends Application{
                 userDoesSomethingWrongLabel.setManaged(true);
                 return;
             }
-
-            
 
             try{
                 Files.writeString(userAccountsFilePath, usernameString + ":" + pwdString + "\n", StandardOpenOption.APPEND, StandardOpenOption.CREATE);
