@@ -115,7 +115,6 @@ public class LoginScreen extends BackgroundSetUp {
         return this.userDoesSomethingWrongLabel;
     }
 
-    @Override
     public StackPane getRootNode(){
         return this.rootStackPane;
     }

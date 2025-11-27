@@ -31,6 +31,4 @@ public abstract class BackgroundSetUp {
     
     abstract void constructVBox();
 
-    abstract StackPane getRootNode();
-
 }

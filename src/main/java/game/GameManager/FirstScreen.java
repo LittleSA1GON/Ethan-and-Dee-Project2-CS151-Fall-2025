@@ -66,7 +66,6 @@ public class FirstScreen extends BackgroundSetUp {
         //instead I'll expose them with getters
     }
 
-    @Override
     public StackPane getRootNode(){
         return this.rootStackPane;
     }
@@ -78,5 +77,4 @@ public class FirstScreen extends BackgroundSetUp {
     public Button getCreateAccountButton(){
         return this.createAccountButton;
     }
-
 }
