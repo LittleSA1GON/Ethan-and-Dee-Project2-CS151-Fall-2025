@@ -149,8 +149,10 @@ public class GameManager extends Application{
                 return false;
             }
         }
-
-        return false; //no file exists -> no user has registered yet
+        else{
+            userDoesSomethingWrongLabel.setText("No such user exists!"); //no file exists -> no user has registered yet
+                return false;
+        }
     }
 
     public static void main(String[] args){

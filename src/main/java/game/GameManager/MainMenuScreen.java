@@ -8,6 +8,10 @@ public class MainMenuScreen extends BackgroundSetUp {
     private String username; 
     private BorderPane rootBorderPane;
 
+    public void constructBorderPane(){
+        
+    }
+
     @Override 
     public void constructVBox(){
 
