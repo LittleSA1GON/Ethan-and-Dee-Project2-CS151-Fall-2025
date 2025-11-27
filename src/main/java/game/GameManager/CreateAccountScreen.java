@@ -91,38 +91,6 @@ public class CreateAccountScreen extends BackgroundSetUp{
         );
         
         createAccountVBox.getChildren().addAll(pleaseSignUp, usernameTF, pwdTF, userDoesSomethingWrongLabel, createAccountButton);
-
-        createAccountButton.setOnAction(event -> {
-            this.usernameString = usernameTF.getText().trim();
-            this.pwdString = pwdTF.getText().trim();
-
-            if(!isValidUsername(this.usernameString)){
-                userDoesSomethingWrongLabel.setVisible(true);
-                userDoesSomethingWrongLabel.setManaged(true);
-                return;
-            }
-
-            if(!isValidPwd(pwdString, usernameString)){
-                userDoesSomethingWrongLabel.setVisible(true);
-                userDoesSomethingWrongLabel.setManaged(true);
-                return;
-            }
-
-            userDoesSomethingWrongLabel.setVisible(false);
-            userDoesSomethingWrongLabel.setManaged(false);
-
-            try{
-                Files.writeString(userAccountsFilePath, usernameString + ":" + pwdString + "\n", StandardOpenOption.APPEND, StandardOpenOption.CREATE);
-            }catch (IOException e){
-                userDoesSomethingWrongLabel.setText("Error: " + e.getMessage());
-                userDoesSomethingWrongLabel.setVisible(true);
-                userDoesSomethingWrongLabel.setManaged(true);
-                return;
-            }
-           
-            //if there were no errors along the way, this is the step to call loginScreen 
-        });
-
     }
 
     public boolean isValidUsername(String username){
@@ -190,6 +158,28 @@ public class CreateAccountScreen extends BackgroundSetUp{
 
         return true;
     }
+
+    public Button getCreateAccountButton(){
+        return this.createAccountButton;
+    }
+
+    public TextField getUsernameTF(){
+        return this.usernameTF;
+    }
+
+    public TextField getPwdTF(){
+        return this.pwdTF;
+    }
+
+    public Label getUserDoesSomethingWrongLabel(){
+        return this.userDoesSomethingWrongLabel;
+    }
+
+    public Path getUserAccountsFilePath(){
+        return this.userAccountsFilePath;
+    }
+
+
 
     @Override
     public StackPane getRootNode(){
