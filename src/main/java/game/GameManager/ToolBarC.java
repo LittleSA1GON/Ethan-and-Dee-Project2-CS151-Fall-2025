@@ -1,0 +1,70 @@
+package game.gamemanager;
+
+
+
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ToolBar;
+
+public class ToolBarC {
+
+    private ToolBar toolBar;
+    private Button mainMenuButton;
+    private Button moreButtonComing;
+    private Label titleLabel = new Label("Game Hub");
+
+    public ToolBarC(){
+        mainMenuButton = new Button("Main Menu");
+        moreButtonComing = new Button("more buttons coming");
+        toolBar = new ToolBar(mainMenuButton, moreButtonComing, titleLabel);
+        makeDesignBetter();
+
+    }
+
+    public ToolBar getToolBar(){
+        return this.toolBar;
+    }
+
+    public Button getMainMenuButton(){
+        return this.mainMenuButton;
+    }
+
+    public void makeDesignBetter(){
+        this.mainMenuButton.setStyle(
+            "-fx-background-color: linear-gradient(#00b4d8, #0077b6);" +
+            "-fx-text-fill: white;" +
+            "-fx-font-weight: bold;" +
+            "-fx-background-radius: 10;" +
+            "-fx-padding: 6 16 6 16;" +
+            "-fx-border-color: rgba(255,255,255,0.25);" +
+            "-fx-border-width: 1;" +
+            "-fx-border-radius: 10;" +
+            "-fx-cursor: hand;"
+        );
+        this.moreButtonComing.setStyle(
+            "-fx-background-color: linear-gradient(#00b4d8, #0077b6);" +
+            "-fx-text-fill: white;" +
+            "-fx-font-weight: bold;" +
+            "-fx-background-radius: 10;" +
+            "-fx-padding: 6 16 6 16;" +
+            "-fx-border-color: rgba(255,255,255,0.25);" +
+            "-fx-border-width: 1;" +
+            "-fx-border-radius: 10;" +
+            "-fx-cursor: hand;"
+            
+        );
+        this.titleLabel.setStyle(
+            "-fx-text-fill: #e0faff;" +
+            "-fx-font-size: 18px;" +
+            "-fx-font-weight: bold;"
+        );
+        this.toolBar.setStyle(
+            "-fx-background-color: rgba(0,0,0,0.75);" +
+            "-fx-padding: 8 16 8 16;" +
+            "-fx-spacing: 10;" +
+            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 8, 0.5, 0, 2);"
+        );
+
+    }
+    
+}

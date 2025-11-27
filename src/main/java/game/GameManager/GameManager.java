@@ -11,6 +11,7 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
@@ -71,7 +72,15 @@ public class GameManager extends Application{
         currScene.setRoot(createAccountScreenRootNode);
 
         attachListnersToCreateAccountScreenButton(createAccountScreen);
-        
+    }
+
+    public void createAndGoToMainMenuScreenScene(){
+        this.primaryStage.setTitle("Main Menu");
+        MainMenuScreen menuScreen = new MainMenuScreen();
+        BorderPane menuScreenRootNode = menuScreen.getRootNode();
+        currScene.setRoot(menuScreenRootNode);
+
+        //TODO: attach listener to play games (2 buttons)
     }
 
     public void attachListnersToCreateAccountScreenButton(CreateAccountScreen createAccountScreen){
@@ -116,6 +125,8 @@ public class GameManager extends Application{
 
             if(checkLoggingInUsername(usernameString, pwdString, userDoesSomethingWrongLabel)){
                 //TODO: call main menu, use high_scores.txt of current user
+                //testing
+                createAndGoToMainMenuScreenScene();
             }
             else{
                 userDoesSomethingWrongLabel.setVisible(true);
