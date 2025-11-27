@@ -18,8 +18,8 @@ public class LoginScreen extends BackgroundSetUp {
 
     private Button loginButton;
 
-    private String usernameString;
-    private String pwdString;
+    private Label successfulLabel = new Label ("Account is created successcully!, please log in");
+    private Label userDoesSomethingWrongLabel;
 
     String oceanImgPathString = "/game/gamemanager/OceanAndIslandTemple:Net.png";
     String gamepadImgPathString ="/game/gamemanager/gamepad_bg_800x600.png";
@@ -29,6 +29,12 @@ public class LoginScreen extends BackgroundSetUp {
         
         constructBackgroundPane(gamepadImgPathString);
         constructDimAndBlurBackgroundImage();
+
+        this.successfulLabel.setVisible(false);
+        this.successfulLabel.setManaged(false);
+        this.successfulLabel.setStyle(
+            "-fx-text-fill: red;"
+        );
        
         constructVBox();
         rootStackPane.getChildren().addAll(backgroundPane, dimOverlay, this.loginVBox);
@@ -65,6 +71,14 @@ public class LoginScreen extends BackgroundSetUp {
             "-fx-prompt-text-fill: black;"
             
         );
+        userDoesSomethingWrongLabel = new Label();
+        userDoesSomethingWrongLabel.setVisible(false);
+        userDoesSomethingWrongLabel.setManaged(false); //don't take up layout space
+        userDoesSomethingWrongLabel.setWrapText(true); //enable text wrapping
+        userDoesSomethingWrongLabel.setMaxWidth(Double.MAX_VALUE);
+        userDoesSomethingWrongLabel.setStyle(
+            "-fx-text-fill: red;"
+        );
 
         this.loginButton = new Button("Login");
         this.loginButton.setMaxWidth(Double.MAX_VALUE); // fill the vBox width
@@ -73,16 +87,32 @@ public class LoginScreen extends BackgroundSetUp {
             "-fx-text-fill: white;"
         );
 
-        loginVBox.getChildren().addAll(pleaseLogin, usernameTF, pwdTF, loginButton);
-        
-        //TODO: use usernameString and pwdString for backend logic
-        loginButton.setOnAction(event -> {
-            this.usernameString = usernameTF.getText();
-            this.pwdString = pwdTF.getText();
+        loginVBox.getChildren().addAll(pleaseLogin, usernameTF, pwdTF, userDoesSomethingWrongLabel, successfulLabel, loginButton);
+    }
 
-            //TODO: handle validation for username and pwd with saved "user_accounts.txt" (also add encrytion for username and pwd in an extra text file)
-        });
+    public void addSuccessfulRegistrationToVBox(){
+        successfulLabel.setVisible(true);
+        successfulLabel.setManaged(true);
+    }
 
+    public Label getSuccessfulLabel(){
+        return this.successfulLabel;
+    }
+    
+    public Button getLoginButton(){
+        return this.loginButton;
+    }
+
+    public TextField getUsernameTF(){
+        return this.usernameTF;
+    }
+
+    public TextField getPasswordTF(){
+        return this.pwdTF;
+    }
+
+    public Label getUserDoesSomethingWrongLabel(){
+        return this.userDoesSomethingWrongLabel;
     }
 
     @Override

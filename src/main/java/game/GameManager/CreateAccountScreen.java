@@ -24,12 +24,7 @@ public class CreateAccountScreen extends BackgroundSetUp{
 
     private Button createAccountButton;
 
-    private String usernameString;
-    private String pwdString;
-
     private Label userDoesSomethingWrongLabel;
-
-    private Path userAccountsFilePath = Paths.get("user_accounts.txt");
 
     String controllerImgPathString = "/game/gamemanager/ChatGPTGeneratedControllerBackground.png";
 
@@ -93,7 +88,7 @@ public class CreateAccountScreen extends BackgroundSetUp{
         createAccountVBox.getChildren().addAll(pleaseSignUp, usernameTF, pwdTF, userDoesSomethingWrongLabel, createAccountButton);
     }
 
-    public boolean isValidUsername(String username){
+    public boolean isValidUsername(String username, Path userAccountsFilePath){
         if(username == null || username.isBlank()) {
             userDoesSomethingWrongLabel.setText("Username cannot be blank or null, please try again!");
             return false;
@@ -130,7 +125,6 @@ public class CreateAccountScreen extends BackgroundSetUp{
                 return false;
             }
        }
-        
         return true;
     }
 
@@ -174,12 +168,6 @@ public class CreateAccountScreen extends BackgroundSetUp{
     public Label getUserDoesSomethingWrongLabel(){
         return this.userDoesSomethingWrongLabel;
     }
-
-    public Path getUserAccountsFilePath(){
-        return this.userAccountsFilePath;
-    }
-
-
 
     @Override
     public StackPane getRootNode(){

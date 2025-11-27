@@ -3,7 +3,9 @@ package game.gamemanager;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.List;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -16,6 +18,9 @@ public class GameManager extends Application{
 
     private Stage primaryStage;
     private Scene currScene;
+    private Path userAccountsFilePath = Paths.get("user_accounts.txt");
+    private Path highScoresFilePath = Paths.get("high_scores.txt");
+
     
     @Override
     public void start(Stage stage){
@@ -36,27 +41,36 @@ public class GameManager extends Application{
 
     public void attachListenersToFirstScreenButtons(Button firstScreenLoginButton, Button firstScreenSignUpButton){
         firstScreenLoginButton.setOnAction(event -> {
-            createAndGoToLoginScreenScene();
-            this.primaryStage.setTitle("User Login");
+            createAndGoToLoginScreenScene(false);
         });
         firstScreenSignUpButton.setOnAction(event -> {
             createAndGoToCreateAccountScreenScene();
-            this.primaryStage.setTitle("Create an Account");
         });
     }
 
-    public void createAndGoToLoginScreenScene(){
+    public void createAndGoToLoginScreenScene(boolean comehereAfterRegistration){
+        this.primaryStage.setTitle("User Login");
         LoginScreen loginScreen = new LoginScreen();
         StackPane loginScreenRootNode = loginScreen.getRootNode();
         currScene.setRoot(loginScreenRootNode); //Not create a new scene but switch root
+
+        if(comehereAfterRegistration){
+            loginScreen.addSuccessfulRegistrationToVBox(); //since user goes to the login page after successful registeration 
+        }
+        attachListenersToLoginScreenButton(loginScreen);
+        loginScreen.getSuccessfulLabel().setVisible(false);
+        loginScreen.getSuccessfulLabel().setManaged(false);
+        
     }
 
     public void createAndGoToCreateAccountScreenScene(){
+        this.primaryStage.setTitle("Create an Account");
         CreateAccountScreen createAccountScreen = new CreateAccountScreen();
         StackPane createAccountScreenRootNode = createAccountScreen.getRootNode();
         currScene.setRoot(createAccountScreenRootNode);
 
         attachListnersToCreateAccountScreenButton(createAccountScreen);
+        
     }
 
     public void attachListnersToCreateAccountScreenButton(CreateAccountScreen createAccountScreen){
@@ -64,33 +78,80 @@ public class GameManager extends Application{
             String usernameString = createAccountScreen.getUsernameTF().getText().trim();
             String pwdString = createAccountScreen.getPwdTF().getText().trim();
             Label userDoesSomethingWrongLabel = createAccountScreen.getUserDoesSomethingWrongLabel();
-            Path userAccountsFilePath = createAccountScreen.getUserAccountsFilePath();
 
-            if(!createAccountScreen.isValidUsername(usernameString)){
+            if(!createAccountScreen.isValidUsername(usernameString, userAccountsFilePath)){
                 userDoesSomethingWrongLabel.setVisible(true);
                 userDoesSomethingWrongLabel.setManaged(true);
                 return;
             }
-
             if(!createAccountScreen.isValidPwd(pwdString, usernameString)){
                 userDoesSomethingWrongLabel.setVisible(true);
                 userDoesSomethingWrongLabel.setManaged(true);
                 return;
             }
 
-            userDoesSomethingWrongLabel.setVisible(false);
-            userDoesSomethingWrongLabel.setManaged(false);
+            
 
             try{
                 Files.writeString(userAccountsFilePath, usernameString + ":" + pwdString + "\n", StandardOpenOption.APPEND, StandardOpenOption.CREATE);
+                Files.writeString(highScoresFilePath, usernameString + ":1000:1000:1000:1000:1000:1000:1000:1000:1000:1000" + "\n" + StandardOpenOption.APPEND, StandardOpenOption.CREATE);
             }catch (IOException e){
                 userDoesSomethingWrongLabel.setText("Error: " + e.getMessage());
                 userDoesSomethingWrongLabel.setVisible(true);
                 userDoesSomethingWrongLabel.setManaged(true);
                 return;
             }
-            //if there were no errors along the way, this is the step to call loginScreen 
+            
+            createAndGoToLoginScreenScene(true);//if there were no errors along the way, this is the step to call loginScreen 
         });
+    }
+
+    public void attachListenersToLoginScreenButton(LoginScreen loginScreen){
+        loginScreen.getLoginButton().setOnAction(event -> {
+            String usernameString = loginScreen.getUsernameTF().getText().trim();
+            String pwdString = loginScreen.getPasswordTF().getText().trim();
+            Label userDoesSomethingWrongLabel = loginScreen.getUserDoesSomethingWrongLabel();
+
+            userDoesSomethingWrongLabel.setVisible(false);
+            userDoesSomethingWrongLabel.setManaged(false);
+
+            if(checkLoggingInUsername(usernameString, pwdString, userDoesSomethingWrongLabel)){
+                //TODO: call main menu, use high_scores.txt of current user
+            }
+            else{
+                userDoesSomethingWrongLabel.setVisible(true);
+                userDoesSomethingWrongLabel.setManaged(true);
+            }
+        });
+    }
+
+    public boolean checkLoggingInUsername(String username, String pwd, Label userDoesSomethingWrongLabel){
+        if(Files.exists(userAccountsFilePath) && Files.isReadable(userAccountsFilePath)){
+            try{
+                List<String> lines = Files.readAllLines(userAccountsFilePath);
+                for(String line : lines){
+                    String[] parts = line.split(":", 2); //username = parts[0], password = parts[1]
+                    if(username.equals(parts[0])){
+                        if(pwd.equals(parts[1])){
+                            //TODO: use this user's info to go to his main menu
+                            return true;
+                        }
+                        else{
+                            userDoesSomethingWrongLabel.setText("Incorrect Username or password"); //wrong password, but use generic message for security reasons
+                            return false; //can return (unique usernames)
+                        }
+                    }
+                }
+                userDoesSomethingWrongLabel.setText("No such user exists!");
+                return false;
+
+            }catch(IOException e){
+                userDoesSomethingWrongLabel.setText("Error: " + e.getMessage());
+                return false;
+            }
+        }
+
+        return false; //no file exists -> no user has registered yet
     }
 
     public static void main(String[] args){
