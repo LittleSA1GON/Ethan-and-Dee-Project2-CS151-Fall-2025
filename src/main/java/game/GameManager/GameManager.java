@@ -94,7 +94,7 @@ public class GameManager extends Application{
 
             try{
                 Files.writeString(userAccountsFilePath, usernameString + ":" + pwdString + "\n", StandardOpenOption.APPEND, StandardOpenOption.CREATE);
-                Files.writeString(highScoresFilePath, usernameString + ":1000:1000:1000:1000:1000:1000:1000:1000:1000:1000" + "\n" + StandardOpenOption.APPEND, StandardOpenOption.CREATE);
+                Files.writeString(highScoresFilePath, usernameString + ":1000:1000:1000:1000:1000:1000:1000:1000:1000:1000" + "\n" , StandardOpenOption.APPEND, StandardOpenOption.CREATE);
             }catch (IOException e){
                 userDoesSomethingWrongLabel.setText("Error: " + e.getMessage());
                 userDoesSomethingWrongLabel.setVisible(true);
