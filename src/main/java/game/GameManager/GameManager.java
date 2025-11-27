@@ -32,10 +32,15 @@ public class GameManager extends Application{
     }
 
     public void attachListenersToFirstScreenButtons(Button firstScreenLoginButton, Button firstScreenSignUpButton){
-       
+
         firstScreenLoginButton.setOnAction(event -> {
             createAndGoToLoginScreenScene();
             this.primaryStage.setTitle("User Login");
+        });
+
+        firstScreenSignUpButton.setOnAction(event -> {
+            createAndGoToCreateAccountScreenScene();
+            this.primaryStage.setTitle("Create an Account");
         });
     }
 
@@ -43,6 +48,12 @@ public class GameManager extends Application{
         LoginScreen loginScreen = new LoginScreen();
         StackPane loginScreenRootNode = loginScreen.getRootNode();
         currScene.setRoot(loginScreenRootNode); //Not create a new scene but switch root
+    }
+
+    public void createAndGoToCreateAccountScreenScene(){
+        CreateAccountScreen createAccountScreen = new CreateAccountScreen();
+        StackPane createAccountScreenRootNode = createAccountScreen.getRootNode();
+        currScene.setRoot(createAccountScreenRootNode);
     }
 
     public static void main(String[] args){
