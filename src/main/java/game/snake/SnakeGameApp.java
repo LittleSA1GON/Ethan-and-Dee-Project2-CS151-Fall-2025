@@ -1,5 +1,8 @@
 package game.snake;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -9,7 +12,7 @@ public class SnakeGameApp extends Application{
     @Override 
     public void start(Stage primaryStage){
         
-        SnakeGame snakeGame = new SnakeGame();
+        SnakeGame snakeGame = new SnakeGame(Paths.get("high_scores.txt"), null, null);
         
         snakeGame.startGame();
 

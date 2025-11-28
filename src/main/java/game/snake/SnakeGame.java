@@ -1,9 +1,12 @@
 package game.snake;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import game.gamemanager.BackgroundSetUp;
+import game.gamemanager.ToolBarC;
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -15,18 +18,22 @@ import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
-public class SnakeGame {
+public class SnakeGame extends BackgroundSetUp {
 
     private Label currScoreLabel = new Label(); //restart from 0 everytime game restarts -->use currScoreLabel.setText(String.valueOf(newScore)); to update it with real time
     private int score = 0;
-    private VBox root; //top = toolbar, right beneath the toolbar = score (Hbox), the rest = canvas
-    private ToolBar toolBar;
+    private VBox vBox; //top = toolbar, right beneath the toolbar = score (Hbox), the rest = canvas
+    private ToolBarC toolBarC;
+
+    private StackPane stackPaneRoot;
+    private BorderPane borderPane;
 
     private HBox scoreHBox;
     private HBox gameOverScoreHBox;
@@ -50,8 +57,6 @@ public class SnakeGame {
     private Button restartButton = new Button("Play Again");
     
 
-    
-
     private Image snakeHead = new Image("/game/snake/ChatGPTGeneratedSnakeHead.png");
     private Image arrowEmoji = new Image("/game/snake/ChatGPTGeneratedArrowKey.png");
     private Image gameOverImage = new Image("/game/snake/ChatGPTGeneratedGameOver.png");
@@ -60,17 +65,33 @@ public class SnakeGame {
     private ImageView pauseOverlay = new ImageView(gamePauseImage);
     /*
      * TODO: Paste the ToolBar logic + UI and add it to the root (VBox)
+     * TODO: attach the highscore with higestScoresFile
      */
 
-    public SnakeGame(){ 
-        this.toolBar = initToolBar(); //incorporating abstraction everywhere possible to make code readable
-        this.scoreHBox = initScoreHBox();
+    public SnakeGame(Path highestScoresFilePath, String username, ToolBarC toolBarC){ 
+        this.toolBarC = toolBarC; 
+        this.scoreHBox = initScoreHBox(); //incorporating abstraction everywhere possible to make code readable
         this.canvas = constructCanvas(); 
-        this.root = constructRoot();
+        constructVBox(); 
         restartButton.setVisible(false);
         pauseOverlay.setVisible(false);
 
-        root.setOnKeyPressed(event -> {
+        constructBackgroundPane("/game/gamemanager/gamepad_bg_800x600.png");
+        constructDimAndBlurBackgroundImage();
+
+        StackPane centerStack = new StackPane(this.vBox); //to make vBox goes in the middle of the scene
+        StackPane.setAlignment(this.vBox, Pos.CENTER);
+
+
+        this.borderPane = new BorderPane();
+
+        borderPane.setTop(toolBarC.getToolBar());
+        borderPane.setCenter(centerStack);
+
+        this.stackPaneRoot = new StackPane(backgroundPane, dimOverlay, this.borderPane);
+        StackPane.setAlignment(this.borderPane, Pos.TOP_CENTER);
+
+        this.stackPaneRoot.setOnKeyPressed(event -> {
 
             KeyCode keyCode = event.getCode();
             
@@ -95,23 +116,14 @@ public class SnakeGame {
                 default -> {}   
             }
         });
-
         restartButton.setOnAction(event -> {
             startGame();
         });
-
     }//end of constructor
-
-    private ToolBar initToolBar(){ //initializing ToolBar (update this after completing game manager)
-        return new ToolBar(
-            new Button("Menu"),
-            new Button("More Button Coming")
-        );
-    }//end of initToolBar
 
     private HBox initScoreHBox(){
          HBox hBox = new HBox(15);
-         hBox.setPadding(new Insets(20));
+        // hBox.setPadding(new Insets(20));
          hBox.setAlignment(Pos.TOP_RIGHT);
 
          Label scoreLabel = new Label("Score: ");
@@ -128,14 +140,15 @@ public class SnakeGame {
 
         this.gridCanvas = new int[448 / CELL_SIZE][700 / CELL_SIZE]; //first index = row, second index = column 
 
-        gc.setFill(Color.web("#FADA5E"));
+        gc.setFill(Color.web("#b38effff"));
         gc.fillRect(0, 0, canvasL.getWidth(), canvasL.getHeight());
 
         return canvasL;
     }//end of constructCanvas
 
-    private VBox constructRoot(){
-        VBox vBox = new VBox(10);
+    @Override
+    public void constructVBox(){
+        this.vBox = new VBox(10);
         vBox.setPadding(new Insets(15));
 
         this.canvasHolderStackPane = new StackPane(canvas);
@@ -148,11 +161,9 @@ public class SnakeGame {
         pauseOverlay.setFitWidth(720);
         pauseOverlay.setFitHeight(460);
         pauseOverlay.setPreserveRatio(false);
-        
        
-        vBox.setAlignment(Pos.CENTER); 
-        vBox.getChildren().addAll(this.toolBar, this.scoreHBox, canvasHolderStackPane);
-        return vBox;
+        vBox.setAlignment(Pos.TOP_CENTER); 
+        vBox.getChildren().addAll(this.scoreHBox, canvasHolderStackPane);
     }//end of constructRoot
 
     private void createFood(){ 
@@ -164,7 +175,6 @@ public class SnakeGame {
     }//end of createFood
 
     public void renderLines(){
-
         gc.setStroke(Color.GRAY);
         gc.setLineWidth(1);
 
@@ -378,7 +388,6 @@ public class SnakeGame {
 
     public void displayScoreOnGameOver(){
 
-       
         Label yourScoreLabel = new Label("Your Score: ");
         yourScoreLabel.setStyle("-fx-font-size: 32px; -fx-font-weight: bold;");
         
@@ -431,6 +440,7 @@ public class SnakeGame {
         newDirection = currDirection;
         restartButton.setVisible(false);
         this.score = 0; //TODO: the score should be checked against all 5 highest score for this user and update if higher
+        currScoreLabel.setText(String.valueOf(score));
         snake.clear();
         
 
@@ -473,10 +483,9 @@ public class SnakeGame {
             }
         };
         this.animationTimer.start(); //start the loop
-        root.requestFocus();
+        this.stackPaneRoot.requestFocus();
     }//end of startGame()
 
-    public VBox getRootNode(){ return this.root; }
-
+    public StackPane getRootNode(){ return this.stackPaneRoot; }
 
 }
