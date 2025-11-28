@@ -68,9 +68,6 @@ public class SnakeGame extends BackgroundSetUp {
 
     private Image gamePauseImage = new Image("/game/snake/ChatGPTGeneratedGamePause.png");
     private ImageView pauseOverlay = new ImageView(gamePauseImage);
-    /*
-     * TODO: attach the highscore with higestScoresFile
-     */
 
     public SnakeGame(Path highestScoresFilePath, int[] snakeGameScores, String username, ToolBarC toolBarC){ 
         this.toolBarC = toolBarC; 
@@ -382,38 +379,8 @@ public class SnakeGame extends BackgroundSetUp {
     }
 
     public void gameOver(){
-        if(needToUpdateSnakeGameScoresArray(this.score)){ //TODO: when gameover, compare the scores
-            //Instantly write to the file here so that even when user close the program after the game is over, the file will always get updated 
-            if(Files.exists(highScoresFilePath) && Files.isReadable(highScoresFilePath) && Files.isWritable(highScoresFilePath)){
-                try{
-                    List<String> lines = Files.readAllLines(highScoresFilePath);
-                    for(int i=0; i < lines.size(); i++) {
-                        String line = lines.get(i);
-                        String[] parts = line.split(":", 11);
-                        if(parts[0].equals(this.username)){
-                            //update this user's snake game scores
-                            String updatedString = 
-                            parts[0] + ":" +
-                            snakeGameScores[0] + ":" +
-                            snakeGameScores[1] + ":" +
-                            snakeGameScores[2] + ":" +
-                            snakeGameScores[3] + ":" +
-                            snakeGameScores[4] + ":" +
-                            parts[6] + ":" +
-                            parts[7] + ":" +
-                            parts[8] + ":" +
-                            parts[9] + ":" +
-                            parts[10];
-                            lines.set(i, updatedString);
-                            break;
-                        }
-                    }
-                    Files.write(highScoresFilePath, lines); //replace the old high_scores.txt
-                }catch(IOException e){
-                    System.out.println("Failed to update high scores."); //should not happen TT
-                    e.printStackTrace();
-                }
-            }
+        if(needToUpdateSnakeGameScoresArray(this.score)){  //Instantly write to the file here so that even when user close the program after the game is over, the file will always get updated 
+            writeToFile();
         }
         this.animationTimer.stop();
         this.isGameOver = true;
@@ -424,6 +391,39 @@ public class SnakeGame extends BackgroundSetUp {
 
         displayScoreOnGameOver();
     }//end of gameover()
+
+    private void writeToFile(){
+        if(Files.exists(highScoresFilePath) && Files.isReadable(highScoresFilePath) && Files.isWritable(highScoresFilePath)){
+            try{
+                List<String> lines = Files.readAllLines(highScoresFilePath);
+                for(int i=0; i < lines.size(); i++) {
+                    String line = lines.get(i);
+                    String[] parts = line.split(":", 11);
+                    if(parts[0].equals(this.username)){
+                        //update this user's snake game scores
+                        String updatedString = 
+                        parts[0] + ":" +
+                        snakeGameScores[0] + ":" +
+                        snakeGameScores[1] + ":" +
+                        snakeGameScores[2] + ":" +
+                        snakeGameScores[3] + ":" +
+                        snakeGameScores[4] + ":" +
+                        parts[6] + ":" +
+                        parts[7] + ":" +
+                        parts[8] + ":" +
+                        parts[9] + ":" +
+                        parts[10];
+                        lines.set(i, updatedString);
+                        break;
+                    }
+                }
+                Files.write(highScoresFilePath, lines); //replace the old high_scores.txt
+            }catch(IOException e){
+                System.out.println("Failed to update high scores."); //should not happen TT
+                e.printStackTrace();
+            }
+        }
+    }
 
     public void displayScoreOnGameOver(){
 
