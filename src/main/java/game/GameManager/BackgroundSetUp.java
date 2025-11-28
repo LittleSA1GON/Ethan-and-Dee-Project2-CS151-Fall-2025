@@ -27,6 +27,6 @@ public abstract class BackgroundSetUp {
         this.backgroundPane.setEffect(blur);
     }
     
-    abstract void constructVBox();
+    protected abstract void constructVBox();
 
 }
