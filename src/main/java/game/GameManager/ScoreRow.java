@@ -1,4 +1,4 @@
-package game.gamemanager;
+package game.GameManager;
 
 public class ScoreRow {
     private int snakeGameScore;

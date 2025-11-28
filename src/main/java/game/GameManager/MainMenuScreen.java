@@ -1,5 +1,5 @@
 
-package game.gamemanager;
+package game.GameManager;
 
 import java.io.IOException;
 import java.nio.file.Files;

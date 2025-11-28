@@ -1,4 +1,4 @@
-package game.gamemanager;
+package game.GameManager;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;

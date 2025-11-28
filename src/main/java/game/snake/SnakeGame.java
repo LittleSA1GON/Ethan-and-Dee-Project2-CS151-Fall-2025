@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import game.gamemanager.BackgroundSetUp;
-import game.gamemanager.ToolBarC;
+import game.GameManager.BackgroundSetUp;
+import game.GameManager.ToolBarC;
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

@@ -14,7 +14,7 @@
     <maven.compiler.target>21</maven.compiler.target>
     <javafx.version>25</javafx.version>                 <!-- For Ethan, match your JavaFx version -->
     <javafx.platform></javafx.platform>
-    <mainClass>game.gamemanager.GameManager</mainClass> <!-- default-->
+    <mainClass>game.GameManager.GameManager</mainClass> <!-- default-->
   </properties>
 
   <!-- JavaFX dependencies -->

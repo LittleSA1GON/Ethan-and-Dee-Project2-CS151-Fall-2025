@@ -1,4 +1,4 @@
-package game.gamemanager;
+package game.GameManager;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
