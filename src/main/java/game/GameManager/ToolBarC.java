@@ -5,7 +5,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ToolBar;
 
 public class ToolBarC {
-
     private ToolBar toolBar;
     private Button mainMenuButton;
     private Button moreButtonComing;
