@@ -14,7 +14,7 @@
     <maven.compiler.target>21</maven.compiler.target>
     <javafx.version>25</javafx.version>                 <!-- For Ethan, match your JavaFx version -->
     <javafx.platform></javafx.platform>
-    <mainClass>game.GameManager.GameManager</mainClass> <!-- default-->
+    <mainClass>game.gamemanager.GameManager</mainClass> <!-- default-->
   </properties>
 
   <!-- JavaFX dependencies -->
@@ -45,6 +45,16 @@
         <configuration>
           <!-- For Ethan, we will keep this but test run our games telling Maven which main class to run -->
           <mainClass>${mainClass}</mainClass> <!-- default-->
+        </configuration>
+      </plugin>
+
+      <!-- Exec Maven plugin -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.6.2</version>
+        <configuration>
+          <mainClass>${mainClass}</mainClass>
         </configuration>
       </plugin>
     </plugins>

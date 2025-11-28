@@ -2,15 +2,15 @@ package game.blackjack.players;
 
 public class Computer extends Player implements Gambler{
     @Override
-    void hit() {
+    public void hit() {
     }
 
     @Override
-    void stand() {
+    public void stand() {
     }
 
     @Override
-    public void placeBet() {
+    public void placeBet(int amount) {
         
     }
 }

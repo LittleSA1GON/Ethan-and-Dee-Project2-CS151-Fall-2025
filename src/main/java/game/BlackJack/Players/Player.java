@@ -19,13 +19,15 @@ public abstract class Player {
 
     public void resetHand() {
         hand.clear();
+        hasStood = false;
+        hasBusted = false;
         currScore = 0;
         betAmount = 0;
     }
 
-    abstract void hit();
+    public abstract void hit();
 
-    abstract void stand();
+    public abstract void stand();
     
     public void updateScore() {
         if (pizzaBlackJack()) {
@@ -115,5 +117,61 @@ public abstract class Player {
 
     public boolean getIsBankrupt(){
         return this.isBankrupt;
+    }
+    
+    public void setHasStood(boolean stood) {
+        this.hasStood = stood;
+    }
+
+    public void setHasBusted(boolean busted) {
+        this.hasBusted = busted;
+    }
+
+    public void setCurrScore(int score) {
+        this.currScore = score;
+    }
+
+    public void setMoney(int amount) {
+        this.money = amount;
+    }
+
+    public void setHand(List<Card> hand) {
+        this.hand = new ArrayList<>(hand);
+    }
+
+    public void addCard(Card card) {
+        hand.add(card);
+        updateScore();
+    }
+
+    public void setBetAmount(int amount) {
+        this.betAmount = amount;
+    }
+
+    public void winBet() {
+        money += (betAmount * 2); 
+    }
+
+    public void loseBet() {
+        if (money <= 0) {
+            isBankrupt = true;
+            money = 0;
+        }
+    }
+
+    public void tieRound() {
+        money += betAmount;
+    }
+
+    public void blackJackBet() {
+        money += betAmount * 1.5;
+    }
+
+    public boolean hasStood() {
+        return hasStood;
+    }
+
+    public boolean hasBusted() {
+        return hasBusted;
     }
 }

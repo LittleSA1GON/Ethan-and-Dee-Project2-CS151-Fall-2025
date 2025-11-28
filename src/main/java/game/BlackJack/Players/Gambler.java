@@ -1,5 +1,5 @@
 package game.blackjack.players;
 
 public interface Gambler {
-    void placeBet();
+    void placeBet(int amount);
 }
