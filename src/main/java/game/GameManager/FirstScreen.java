@@ -12,7 +12,7 @@ public class FirstScreen extends BackgroundSetUp {
     private Button loginButton;
     private Button createAccountButton;
 
-    String oceanImgPathString = "/game/gamemanager/OceanAndIslandTemple:Net.png";
+    String oceanImgPathString = "/game/gamemanager/OceanAndIslandTemple.png";
     
     public FirstScreen(){
         rootStackPane = new StackPane();

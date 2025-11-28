@@ -19,7 +19,7 @@ public class LoginScreen extends BackgroundSetUp {
     private Label successfulLabel = new Label ("Account is created successcully!, please log in");
     private Label userDoesSomethingWrongLabel;
 
-    String oceanImgPathString = "/game/gamemanager/OceanAndIslandTemple:Net.png";
+    String oceanImgPathString = "/game/gamemanager/OceanAndIslandTemple.png";
     String gamepadImgPathString ="/game/gamemanager/gamepad_bg_800x600.png";
 
     public LoginScreen(){
