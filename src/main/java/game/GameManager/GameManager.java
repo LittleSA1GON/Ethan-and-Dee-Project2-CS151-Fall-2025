@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
+
+import game.snake.SnakeGame;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -13,6 +15,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class GameManager extends Application{
@@ -84,18 +87,26 @@ public class GameManager extends Application{
         currScene.setRoot(menuScreenRootNode);
 
         //TODO: attach listener to play games (2 buttons), main menu buttons
-        attachListenersToMainMenuScreenButtons(menuScreen);
+        attachListenersToMainMenuScreenButtons(menuScreen, username);
     }
 
-    public void attachListenersToMainMenuScreenButtons(MainMenuScreen menuScreen){
+    public void attachListenersToMainMenuScreenButtons(MainMenuScreen menuScreen, String username){
         menuScreen.getSnakeGameButton().setOnAction(event -> {
             menuScreen.getDispalyLabel().setVisible(false);
             menuScreen.getDispalyLabel().setManaged(false);
+            //TODO
+            this.primaryStage.setTitle("Snake Game");
+            SnakeGame snakeGame = new SnakeGame(highScoresFilePath, username, this.toolBarC);
+            snakeGame.startGame(); 
 
+            StackPane snakeGameRootNode = snakeGame.getRootNode();
+            currScene.setRoot(snakeGameRootNode); //don't create a new scene but instead change the rootnode of currScene so that we can keep shared ToolBarC
+            snakeGameRootNode.requestFocus(); 
         });
         menuScreen.getBlackjackButton().setOnAction(event -> {
             menuScreen.getDispalyLabel().setVisible(false);
             menuScreen.getDispalyLabel().setManaged(false);
+            //TODO
 
         });
         menuScreen.getMoreGameComingButton().setOnAction(event -> {
