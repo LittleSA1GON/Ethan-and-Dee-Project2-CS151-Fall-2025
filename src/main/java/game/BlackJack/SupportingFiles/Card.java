@@ -1,7 +1,7 @@
-package game.BlackJack.SupportingFiles;
+package game.blackjack.supportingfiles;
 
-import game.BlackJack.SupportingFiles.CardEnums.Suit;
-import game.BlackJack.SupportingFiles.CardEnums.Rank;
+import game.blackjack.supportingfiles.cardenums.Rank;
+import game.blackjack.supportingfiles.cardenums.Suit;
 
 public class Card {
     private final Suit suit;

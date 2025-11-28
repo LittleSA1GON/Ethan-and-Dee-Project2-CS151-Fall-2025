@@ -1,4 +1,4 @@
-package game.BlackJack.SupportingFiles.CardEnums;
+package game.blackjack.supportingfiles.cardenums;
 
 public enum Rank {
     ACE("Ace"),

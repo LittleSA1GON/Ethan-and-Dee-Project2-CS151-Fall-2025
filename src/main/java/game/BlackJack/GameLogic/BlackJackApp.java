@@ -1,4 +1,4 @@
-package game.BlackJack.GameLogic;
+package game.blackjack.gamelogic;
 
 public class BlackJackApp {
     

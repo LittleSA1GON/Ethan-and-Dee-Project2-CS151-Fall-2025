@@ -1,9 +1,11 @@
-package game.BlackJack.Players;
+package game.blackjack.players;
 
 import java.util.List;
+
+import game.blackjack.supportingfiles.Card;
+import game.blackjack.supportingfiles.cardenums.Rank;
+
 import java.util.ArrayList;
-import game.BlackJack.SupportingFiles.Card;
-import game.BlackJack.SupportingFiles.CardEnums.Rank;
 
 public abstract class Player {
     public String username;

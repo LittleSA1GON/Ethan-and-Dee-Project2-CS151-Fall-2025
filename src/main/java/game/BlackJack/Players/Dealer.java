@@ -1,4 +1,4 @@
-package game.BlackJack.Players;
+package game.blackjack.players;
 
 public class Dealer extends Player {
     @Override

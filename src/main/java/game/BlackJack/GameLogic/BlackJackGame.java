@@ -1,12 +1,14 @@
-package game.BlackJack.GameLogic;
+package game.blackjack.gamelogic;
 
 import java.util.Stack;
+
+import game.blackjack.supportingfiles.Card;
+import game.blackjack.supportingfiles.cardenums.Rank;
+import game.blackjack.supportingfiles.cardenums.Suit;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
-import game.BlackJack.SupportingFiles.Card;
-import game.BlackJack.SupportingFiles.CardEnums.Rank;
-import game.BlackJack.SupportingFiles.CardEnums.Suit;
 
 public class BlackJackGame {
     private Stack<Card> shuffledDeck;

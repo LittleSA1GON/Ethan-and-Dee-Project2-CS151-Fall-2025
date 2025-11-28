@@ -1,4 +1,4 @@
-package game.GameManager;
+package game.gamemanager;
 
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.layout.Pane;
