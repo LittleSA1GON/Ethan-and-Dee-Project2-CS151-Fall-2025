@@ -74,13 +74,13 @@ public class GameManager extends Application{
         attachListnersToCreateAccountScreenButton(createAccountScreen);
     }
 
-    public void createAndGoToMainMenuScreenScene(){
+    public void createAndGoToMainMenuScreenScene(String username){
         this.primaryStage.setTitle("Main Menu");
-        MainMenuScreen menuScreen = new MainMenuScreen();
+        MainMenuScreen menuScreen = new MainMenuScreen(highScoresFilePath, username);
         BorderPane menuScreenRootNode = menuScreen.getRootNode();
         currScene.setRoot(menuScreenRootNode);
 
-        //TODO: attach listener to play games (2 buttons)
+        //TODO: attach listener to play games (2 buttons), main menu buttons
     }
 
     public void attachListnersToCreateAccountScreenButton(CreateAccountScreen createAccountScreen){
@@ -124,9 +124,7 @@ public class GameManager extends Application{
             userDoesSomethingWrongLabel.setManaged(false);
 
             if(checkLoggingInUsername(usernameString, pwdString, userDoesSomethingWrongLabel)){
-                //TODO: call main menu, use high_scores.txt of current user
-                //testing
-                createAndGoToMainMenuScreenScene();
+                createAndGoToMainMenuScreenScene(usernameString);
             }
             else{
                 userDoesSomethingWrongLabel.setVisible(true);
