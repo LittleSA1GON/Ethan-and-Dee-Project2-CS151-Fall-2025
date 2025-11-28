@@ -1,7 +1,5 @@
 package game.gamemanager;
 
-
-
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToolBar;
@@ -18,17 +16,14 @@ public class ToolBarC {
         moreButtonComing = new Button("more buttons coming");
         toolBar = new ToolBar(mainMenuButton, moreButtonComing, titleLabel);
         makeDesignBetter();
-
     }
 
     public ToolBar getToolBar(){
         return this.toolBar;
     }
-
     public Button getMainMenuButton(){
         return this.mainMenuButton;
     }
-
     public void makeDesignBetter(){
         this.mainMenuButton.setStyle(
             "-fx-background-color: linear-gradient(#00b4d8, #0077b6);" +
@@ -64,7 +59,5 @@ public class ToolBarC {
             "-fx-spacing: 10;" +
             "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 8, 0.5, 0, 2);"
         );
-
     }
-    
 }

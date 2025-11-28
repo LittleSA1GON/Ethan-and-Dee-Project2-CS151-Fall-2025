@@ -1,10 +1,8 @@
 package game.gamemanager;
 
-
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.effect.GaussianBlur;
 
 public abstract class BackgroundSetUp {
     protected StackPane rootStackPane;
