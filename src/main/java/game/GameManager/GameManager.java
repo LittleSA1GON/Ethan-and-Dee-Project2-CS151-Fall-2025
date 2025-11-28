@@ -11,10 +11,8 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ToolBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class GameManager extends Application{
@@ -24,8 +22,8 @@ public class GameManager extends Application{
     private Path highScoresFilePath = Paths.get("high_scores.txt");
     private ToolBarC toolBarC;
 
-    private int[] snakeGameScores;
-    private int[] blackjackScores;
+    //private int[] snakeGameScores; 
+    //private int[] blackjackScores;
 
     @Override
     public void start(Stage stage){
@@ -140,7 +138,7 @@ public class GameManager extends Application{
             this.toolBarC.getJokeLabel().setManaged(true);
         });
     }
-    
+
     public void attachListnersToCreateAccountScreenButton(CreateAccountScreen createAccountScreen){
         createAccountScreen.getCreateAccountButton().setOnAction(event -> {
             String usernameString = createAccountScreen.getUsernameTF().getText().trim();
