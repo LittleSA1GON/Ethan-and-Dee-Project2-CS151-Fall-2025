@@ -26,6 +26,9 @@ public class GameManager extends Application{
     private Path highScoresFilePath = Paths.get("high_scores.txt");
     private ToolBarC toolBarC;
 
+    private int[] snakeGameScores;
+    private int[] blackjackScores;
+
     @Override
     public void start(Stage stage){
         this.primaryStage = stage;
@@ -86,17 +89,17 @@ public class GameManager extends Application{
         BorderPane menuScreenRootNode = menuScreen.getRootNode();
         currScene.setRoot(menuScreenRootNode);
 
-        //TODO: attach listener to play games (2 buttons), main menu buttons
-        attachListenersToMainMenuScreenButtons(menuScreen, username);
+        //TODO: attach listener to "Play Blackjack" Button
+        attachListenersToMainMenuScreenButtons(menuScreen, username, menuScreen.getSnakeGameScores(), menuScreen.getBlackjackScores());
     }
 
-    public void attachListenersToMainMenuScreenButtons(MainMenuScreen menuScreen, String username){
+    public void attachListenersToMainMenuScreenButtons(MainMenuScreen menuScreen, String username, int[] snakeGameScores, int[] blackjackScores){ //TODO: Look, Top 5 highest Blackjack scores for curent user ready to use
         menuScreen.getSnakeGameButton().setOnAction(event -> {
             menuScreen.getDispalyLabel().setVisible(false);
             menuScreen.getDispalyLabel().setManaged(false);
-            //TODO
+            //TODO: update the top 5 scores file
             this.primaryStage.setTitle("Snake Game");
-            SnakeGame snakeGame = new SnakeGame(highScoresFilePath, username, this.toolBarC);
+            SnakeGame snakeGame = new SnakeGame(highScoresFilePath, snakeGameScores, username, this.toolBarC);
             snakeGame.startGame(); 
 
             StackPane snakeGameRootNode = snakeGame.getRootNode();
@@ -106,7 +109,14 @@ public class GameManager extends Application{
         menuScreen.getBlackjackButton().setOnAction(event -> {
             menuScreen.getDispalyLabel().setVisible(false);
             menuScreen.getDispalyLabel().setManaged(false);
-            //TODO
+            //TODO: Ethan -> use these
+            /* 
+             *BlackJack blackjack = new BlackJack(highScoresFilePath, username, this.toolBarC);
+             *blackjack.startGame();
+             *
+             * YourRootNodeType blackjackRootNode = blackjack.getRootNode();
+             * currScene.setRoot(blackjackRootNode);
+            */
 
         });
         menuScreen.getMoreGameComingButton().setOnAction(event -> {
@@ -155,7 +165,7 @@ public class GameManager extends Application{
 
             try{
                 Files.writeString(userAccountsFilePath, usernameString + ":" + pwdString + "\n", StandardOpenOption.APPEND, StandardOpenOption.CREATE);
-                Files.writeString(highScoresFilePath, usernameString + ":1000:1000:1000:1000:1000:1000:1000:1000:1000:1000" + "\n" , StandardOpenOption.APPEND, StandardOpenOption.CREATE);
+                Files.writeString(highScoresFilePath, usernameString + ":0:0:0:0:0:0:0:0:0:0" + "\n" , StandardOpenOption.APPEND, StandardOpenOption.CREATE); //TODO: Look, this is how everyuser's top 5 scores for both game is initialized 
             }catch (IOException e){
                 userDoesSomethingWrongLabel.setText("Error: " + e.getMessage());
                 userDoesSomethingWrongLabel.setVisible(true);

@@ -12,7 +12,7 @@ public class SnakeGameApp extends Application{
     @Override 
     public void start(Stage primaryStage){
         
-        SnakeGame snakeGame = new SnakeGame(Paths.get("high_scores.txt"), null, null);
+        SnakeGame snakeGame = new SnakeGame(Paths.get("high_scores.txt"),null, null, null);
         
         snakeGame.startGame();
 

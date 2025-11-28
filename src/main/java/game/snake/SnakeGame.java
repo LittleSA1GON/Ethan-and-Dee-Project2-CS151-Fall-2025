@@ -1,5 +1,7 @@
 package game.snake;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +40,13 @@ public class SnakeGame extends BackgroundSetUp {
     private HBox scoreHBox;
     private HBox gameOverScoreHBox;
 
+    private StackPane canvasHolderStackPane;
+    private Button restartButton = new Button("Play Again");
+
+    private int[] snakeGameScores;
+    private Path highScoresFilePath;
+    private String username;
+
     private Canvas canvas;
     private GraphicsContext gc;
     private final int CELL_SIZE = 28; 
@@ -53,10 +62,6 @@ public class SnakeGame extends BackgroundSetUp {
     private boolean playerHitFirstKey = false;
     private boolean gamePaused = false;
 
-    private StackPane canvasHolderStackPane;
-    private Button restartButton = new Button("Play Again");
-    
-
     private Image snakeHead = new Image("/game/snake/ChatGPTGeneratedSnakeHead.png");
     private Image arrowEmoji = new Image("/game/snake/ChatGPTGeneratedArrowKey.png");
     private Image gameOverImage = new Image("/game/snake/ChatGPTGeneratedGameOver.png");
@@ -64,12 +69,14 @@ public class SnakeGame extends BackgroundSetUp {
     private Image gamePauseImage = new Image("/game/snake/ChatGPTGeneratedGamePause.png");
     private ImageView pauseOverlay = new ImageView(gamePauseImage);
     /*
-     * TODO: Paste the ToolBar logic + UI and add it to the root (VBox)
      * TODO: attach the highscore with higestScoresFile
      */
 
-    public SnakeGame(Path highestScoresFilePath, String username, ToolBarC toolBarC){ 
+    public SnakeGame(Path highestScoresFilePath, int[] snakeGameScores, String username, ToolBarC toolBarC){ 
         this.toolBarC = toolBarC; 
+        this.snakeGameScores = snakeGameScores;
+        this.highScoresFilePath = highestScoresFilePath;
+        this.username = username;
         this.scoreHBox = initScoreHBox(); //incorporating abstraction everywhere possible to make code readable
         this.canvas = constructCanvas(); 
         constructVBox(); 
@@ -375,6 +382,39 @@ public class SnakeGame extends BackgroundSetUp {
     }
 
     public void gameOver(){
+        if(needToUpdateSnakeGameScoresArray(this.score)){ //TODO: when gameover, compare the scores
+            //Instantly write to the file here so that even when user close the program after the game is over, the file will always get updated 
+            if(Files.exists(highScoresFilePath) && Files.isReadable(highScoresFilePath) && Files.isWritable(highScoresFilePath)){
+                try{
+                    List<String> lines = Files.readAllLines(highScoresFilePath);
+                    for(int i=0; i < lines.size(); i++) {
+                        String line = lines.get(i);
+                        String[] parts = line.split(":", 11);
+                        if(parts[0].equals(this.username)){
+                            //update this user's snake game scores
+                            String updatedString = 
+                            parts[0] + ":" +
+                            snakeGameScores[0] + ":" +
+                            snakeGameScores[1] + ":" +
+                            snakeGameScores[2] + ":" +
+                            snakeGameScores[3] + ":" +
+                            snakeGameScores[4] + ":" +
+                            parts[6] + ":" +
+                            parts[7] + ":" +
+                            parts[8] + ":" +
+                            parts[9] + ":" +
+                            parts[10];
+                            lines.set(i, updatedString);
+                            break;
+                        }
+                    }
+                    Files.write(highScoresFilePath, lines); //replace the old high_scores.txt
+                }catch(IOException e){
+                    System.out.println("Failed to update high scores."); //should not happen TT
+                    e.printStackTrace();
+                }
+            }
+        }
         this.animationTimer.stop();
         this.isGameOver = true;
         gamePaused = false;
@@ -383,8 +423,7 @@ public class SnakeGame extends BackgroundSetUp {
         gc.drawImage(gameOverImage, 0, 0, 700, 448);
 
         displayScoreOnGameOver();
-
-    }
+    }//end of gameover()
 
     public void displayScoreOnGameOver(){
 
@@ -439,7 +478,7 @@ public class SnakeGame extends BackgroundSetUp {
         currDirection = Direction.getRandomDirection(random);
         newDirection = currDirection;
         restartButton.setVisible(false);
-        this.score = 0; //TODO: the score should be checked against all 5 highest score for this user and update if higher
+        this.score = 0;
         currScoreLabel.setText(String.valueOf(score));
         snake.clear();
         
@@ -485,6 +524,31 @@ public class SnakeGame extends BackgroundSetUp {
         this.animationTimer.start(); //start the loop
         this.stackPaneRoot.requestFocus();
     }//end of startGame()
+
+    private boolean needToUpdateSnakeGameScoresArray(int currScore){
+        boolean firstSmallerScore = true;
+        int leastHighestScore = this.snakeGameScores[4];
+        int temp = 0;
+        if(currScore > leastHighestScore){
+            //keep comparing
+            for(int i = 0; i < snakeGameScores.length; i++){
+                if(this.snakeGameScores[i] < currScore && firstSmallerScore){ //shift down
+                    temp = this.snakeGameScores[i];
+                    this.snakeGameScores[i] = currScore;
+                    firstSmallerScore = false;
+                }
+                if(!firstSmallerScore && currScore > snakeGameScores[i]){
+                    int tempT = this.snakeGameScores[i];
+                    this.snakeGameScores[i] = temp;
+                    temp = tempT;
+                } //then just drop the last one 
+            }
+        }
+        return !firstSmallerScore;
+    }   
+    public int[] getUpdatedSnakeGameScores(){
+        return this.snakeGameScores;
+    }
 
     public StackPane getRootNode(){ return this.stackPaneRoot; }
 
