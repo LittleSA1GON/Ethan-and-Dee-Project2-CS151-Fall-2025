@@ -13,7 +13,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 public class CreateAccountScreen extends BackgroundSetUp{
-
     private VBox createAccountVBox;
 
     private TextField usernameTF;
@@ -149,23 +148,19 @@ public class CreateAccountScreen extends BackgroundSetUp{
 
         return true;
     }
-
+    
     public Button getCreateAccountButton(){
         return this.createAccountButton;
     }
-
     public TextField getUsernameTF(){
         return this.usernameTF;
     }
-
     public TextField getPwdTF(){
         return this.pwdTF;
     }
-
     public Label getUserDoesSomethingWrongLabel(){
         return this.userDoesSomethingWrongLabel;
     }
-
     public StackPane getRootNode(){
         return this.rootStackPane;
     }

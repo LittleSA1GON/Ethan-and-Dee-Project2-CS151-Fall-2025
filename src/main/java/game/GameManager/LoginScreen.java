@@ -9,7 +9,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 public class LoginScreen extends BackgroundSetUp {
-    
     private VBox loginVBox;
 
     private TextField usernameTF;
@@ -93,27 +92,21 @@ public class LoginScreen extends BackgroundSetUp {
         successfulLabel.setVisible(true);
         successfulLabel.setManaged(true);
     }
-
     public Label getSuccessfulLabel(){
         return this.successfulLabel;
     }
-    
     public Button getLoginButton(){
         return this.loginButton;
     }
-
     public TextField getUsernameTF(){
         return this.usernameTF;
     }
-
     public TextField getPasswordTF(){
         return this.pwdTF;
     }
-
     public Label getUserDoesSomethingWrongLabel(){
         return this.userDoesSomethingWrongLabel;
     }
-
     public StackPane getRootNode(){
         return this.rootStackPane;
     }

@@ -8,7 +8,6 @@ public abstract class BackgroundSetUp {
     protected StackPane rootStackPane;
     protected Pane backgroundPane;
     protected Pane dimOverlay;
-    //protected String oceanImgPathString = "/game/gamemanager/OceanAndIslandTemple:Net.png"; 
 
     public void constructBackgroundPane(String oceanImgPathString){
         backgroundPane = new Pane();
@@ -28,5 +27,4 @@ public abstract class BackgroundSetUp {
     }
     
     protected abstract void constructVBox();
-
 }

@@ -8,7 +8,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 public class FirstScreen extends BackgroundSetUp {
-    
     private VBox firstScreenVBox;
     private Button loginButton;
     private Button createAccountButton;
@@ -57,23 +56,16 @@ public class FirstScreen extends BackgroundSetUp {
             "-fx-background-color: #ff0066;" +
             "-fx-text-fill: white;"
         );
-
+        
         firstScreenVBox.getChildren().addAll(welcome, loginButton, createAccountButton);
-
-        //Can't handle them here since they simply don't need do to do anything but the game manager will switch scenes
-        // loginButton.setOnAction(event -> { });
-        // createAccountButton.setOnAction(event -> {});
-        //instead I'll expose them with getters
     }
 
     public StackPane getRootNode(){
         return this.rootStackPane;
     }
-
     public Button getLoginButton(){
         return this.loginButton;
     }
-
     public Button getCreateAccountButton(){
         return this.createAccountButton;
     }

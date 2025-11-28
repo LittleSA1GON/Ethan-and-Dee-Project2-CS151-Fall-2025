@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
-
 import game.snake.SnakeGame;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -19,7 +18,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class GameManager extends Application{
-
     private Stage primaryStage;
     private Scene currScene;
     private Path userAccountsFilePath = Paths.get("user_accounts.txt");
@@ -59,7 +57,7 @@ public class GameManager extends Application{
         this.primaryStage.setTitle("User Login");
         LoginScreen loginScreen = new LoginScreen();
         StackPane loginScreenRootNode = loginScreen.getRootNode();
-        currScene.setRoot(loginScreenRootNode); //Not create a new scene but switch root
+        currScene.setRoot(loginScreenRootNode); //Not create a new scene but switch root (to use the same toolbar)
 
         if(comehereAfterRegistration){
             loginScreen.addSuccessfulRegistrationToVBox(); //since user goes to the login page after successful registeration 
@@ -97,7 +95,6 @@ public class GameManager extends Application{
         menuScreen.getSnakeGameButton().setOnAction(event -> {
             menuScreen.getDispalyLabel().setVisible(false);
             menuScreen.getDispalyLabel().setManaged(false);
-            //TODO: update the top 5 scores file
             this.primaryStage.setTitle("Snake Game");
             SnakeGame snakeGame = new SnakeGame(highScoresFilePath, snakeGameScores, username, this.toolBarC);
             snakeGame.startGame(); 
@@ -117,14 +114,12 @@ public class GameManager extends Application{
              * YourRootNodeType blackjackRootNode = blackjack.getRootNode();
              * currScene.setRoot(blackjackRootNode);
             */
-
         });
         menuScreen.getMoreGameComingButton().setOnAction(event -> {
             menuScreen.getDispalyLabel().setText("We'll add more games in the future!");
             menuScreen.getDispalyLabel().setVisible(true);
             menuScreen.getDispalyLabel().setManaged(true);
         });
-        
     }
 
     public void createAToolBar(String username){
@@ -133,7 +128,7 @@ public class GameManager extends Application{
         this.toolBarC.getJokeLabel().setManaged(false);
         attachListenerToToolBarButtons(username);
     }
-
+    
     public void attachListenerToToolBarButtons(String username){
         this.toolBarC.getMainMenuButton().setOnAction(event -> {
             this.toolBarC.getJokeLabel().setVisible(false);
@@ -145,7 +140,7 @@ public class GameManager extends Application{
             this.toolBarC.getJokeLabel().setManaged(true);
         });
     }
-
+    
     public void attachListnersToCreateAccountScreenButton(CreateAccountScreen createAccountScreen){
         createAccountScreen.getCreateAccountButton().setOnAction(event -> {
             String usernameString = createAccountScreen.getUsernameTF().getText().trim();
