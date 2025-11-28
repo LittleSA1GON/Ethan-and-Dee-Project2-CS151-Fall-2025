@@ -2,10 +2,10 @@ package game.blackjack.players;
 
 public class Dealer extends Player {
     @Override
-    void hit() {
+    public void hit() {
     }
 
     @Override
-    void stand() {
+    public void stand() {
     }
 }
