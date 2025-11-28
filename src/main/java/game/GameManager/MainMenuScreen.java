@@ -13,6 +13,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.ToolBar;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -25,7 +26,7 @@ public class MainMenuScreen extends BackgroundSetUp {
 
     private String username;
     private BorderPane rootBorderPane;
-    private ToolBarC toolBar;
+    private ToolBarC toolBarC;
     private VBox leftVBox;
     private VBox rightVBox;
     private TableView<ScoreRow> highScoreTable; //every row is a ScoreRow object
@@ -56,8 +57,9 @@ public class MainMenuScreen extends BackgroundSetUp {
     "-fx-cursor: hand;" +
     "-fx-pref-width: 240;";
 
-    public MainMenuScreen(Path highScoresFilePath, String username){
+    public MainMenuScreen(Path highScoresFilePath, String username, ToolBarC toolBarC){
         this.username = username;
+        this.toolBarC = toolBarC;
 
         rootBorderPane = new BorderPane();
         construct2HighscoreArrays(highScoresFilePath);
@@ -68,8 +70,7 @@ public class MainMenuScreen extends BackgroundSetUp {
         constructBackgroundPane("/game/gamemanager/ChatGPTGeneratedGamerIcon.png");
         constructDimAndBlurBackgroundImage();
        
-        toolBar = new ToolBarC(); //Top
-        rootBorderPane.setTop(toolBar.getToolBar());
+        rootBorderPane.setTop(toolBarC.getToolBar());
 
         constructVBox(); //Left
         rootBorderPane.setLeft(this.leftVBox);
@@ -87,7 +88,7 @@ public class MainMenuScreen extends BackgroundSetUp {
 
     @Override 
     public void constructVBox(){ //BordorPane's left node
-        leftVBox = new VBox(15);
+        leftVBox = new VBox(10);
 
         Label welcomeLabel = new Label("How's it going, " + username + "?");
         Label randomGameQuote = new Label("\"The right man in the wrong place can make all the difference in the world\"\n-G-Man in Half-Life 2\n");
@@ -113,21 +114,17 @@ public class MainMenuScreen extends BackgroundSetUp {
 
         displayALabel.setVisible(false);
         displayALabel.setManaged(false);
-        //displayALabel.setWrapText(true);
-        //displayALabel.setText("We'll add more games in the future, thank you for your patience"); //add this to the futureGameButton listener in gamemanager
 
         leftVBox.setAlignment(Pos.CENTER);
         leftVBox.setPrefWidth(290);
         leftVBox.setMaxWidth(380);
 
-        leftVBox.getChildren().addAll(displayALabel, gameIconHBox, welcomeLabel, randomGameQuote, snakeGameButton, blackJackButton, futureGameButton);
+        leftVBox.getChildren().addAll(gameIconHBox, welcomeLabel, randomGameQuote, snakeGameButton, blackJackButton, futureGameButton, displayALabel);
 
         leftVBox.setStyle(
             "-fx-background-color: rgba(0, 0, 0, 1);" +  // dark semi-transparent card
-            //"-fx-background-radius: 18;" +
             "-fx-padding: 30 28 30 28;" +                   // top right bottom left
-            "-fx-spacing: 18;" +
-            "-fx-alignment: center_left;"
+            "-fx-alignment: center;"
         );
         welcomeLabel.setStyle(
             "-fx-text-fill: #ffffff;" +
@@ -142,6 +139,10 @@ public class MainMenuScreen extends BackgroundSetUp {
             "-fx-line-spacing: 4px;" +
             "-fx-opacity: 0.9;"
         );
+        displayALabel.setStyle(
+            "-fx-text-fill: red;"
+        );
+        displayALabel.setWrapText(true);
     }
 
     public void constructRightVBox(){
@@ -253,4 +254,13 @@ public class MainMenuScreen extends BackgroundSetUp {
         return this.displayALabel;
     }
 
+    public Button getSnakeGameButton(){
+        return this.snakeGameButton;
+    }
+    public Button getBlackjackButton(){
+        return this.blackJackButton;
+    }
+    public Button getMoreGameComingButton(){
+        return this.futureGameButton;
+    }
 }

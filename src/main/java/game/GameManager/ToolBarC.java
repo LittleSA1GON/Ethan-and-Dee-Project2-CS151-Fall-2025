@@ -10,11 +10,14 @@ public class ToolBarC {
     private Button mainMenuButton;
     private Button moreButtonComing;
     private Label titleLabel = new Label("Game Hub");
+    private Label jokeLabel = new Label("Don't click this, you are making me sad");
 
     public ToolBarC(){
         mainMenuButton = new Button("Main Menu");
         moreButtonComing = new Button("more buttons coming");
-        toolBar = new ToolBar(mainMenuButton, moreButtonComing, titleLabel);
+        jokeLabel.setVisible(false);
+        jokeLabel.setManaged(false);
+        toolBar = new ToolBar(mainMenuButton, moreButtonComing, titleLabel, jokeLabel);
         makeDesignBetter();
     }
 
@@ -23,6 +26,12 @@ public class ToolBarC {
     }
     public Button getMainMenuButton(){
         return this.mainMenuButton;
+    }
+    public Button getMoreButtonComing(){
+        return this.moreButtonComing;
+    }
+    public Label getJokeLabel(){
+        return this.jokeLabel;
     }
     public void makeDesignBetter(){
         this.mainMenuButton.setStyle(
@@ -46,12 +55,14 @@ public class ToolBarC {
             "-fx-border-width: 1;" +
             "-fx-border-radius: 10;" +
             "-fx-cursor: hand;"
-            
         );
         this.titleLabel.setStyle(
             "-fx-text-fill: #e0faff;" +
             "-fx-font-size: 18px;" +
             "-fx-font-weight: bold;"
+        );
+        this.jokeLabel.setStyle(
+            "-fx-text-fill: red;"
         );
         this.toolBar.setStyle(
             "-fx-background-color: rgba(0,0,0,0.75);" +
