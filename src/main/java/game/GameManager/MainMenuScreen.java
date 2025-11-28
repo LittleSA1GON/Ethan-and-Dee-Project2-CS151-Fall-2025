@@ -60,18 +60,14 @@ public class MainMenuScreen extends BackgroundSetUp {
     "-fx-pref-width: 240;";
 
     public MainMenuScreen(Path highScoresFilePath, String username){
-
         this.username = username;
 
         rootBorderPane = new BorderPane();
         construct2HighscoreArrays(highScoresFilePath);
-        
-        
         constructRootBorderPane();
     }
 
     public void constructRootBorderPane(){
-
         constructBackgroundPane("/game/gamemanager/ChatGPTGeneratedGamerIcon.png");
         constructDimAndBlurBackgroundImage();
        
@@ -81,12 +77,12 @@ public class MainMenuScreen extends BackgroundSetUp {
         constructVBox(); //Left
         rootBorderPane.setLeft(this.leftVBox);
 
-        constructRightVBox(); //Right
+        constructRightVBox(); //Center
         VBox outerVBoxWrapper = new VBox(this.rightVBox); //for design purpose, I want the top5ScoresLabel and the table to appear abit lower so we can see the background image
         outerVBoxWrapper.setAlignment(Pos.TOP_CENTER);
         outerVBoxWrapper.setPadding(new Insets(50, 0, 0, 0));
 
-        StackPane rightVBoxWrapper = new StackPane(backgroundPane, outerVBoxWrapper);
+        StackPane rightVBoxWrapper = new StackPane(backgroundPane, outerVBoxWrapper); //to add background + outerVBoxWrapper to Center
         StackPane.setAlignment(rightVBox, Pos.TOP_CENTER);
 
         rootBorderPane.setCenter(rightVBoxWrapper);
@@ -102,10 +98,12 @@ public class MainMenuScreen extends BackgroundSetUp {
         welcomeLabel.setWrapText(true);
 
         snakeGameButton = new Button("Play Snake Game");
-        blackJackButton = new Button("Play Blackjack");
-        futureGameButton = new Button("More Games Coming");
         snakeGameButton.setStyle(primaryGameButtonStyle);
+
+        blackJackButton = new Button("Play Blackjack");
         blackJackButton.setStyle(primaryGameButtonStyle);
+
+        futureGameButton = new Button("More Games Coming");
         futureGameButton.setStyle(primaryGameButtonStyle);
 
         ImageView gameIconImageView = new ImageView(gamerIconImage);
@@ -119,14 +117,13 @@ public class MainMenuScreen extends BackgroundSetUp {
         displayALabel.setVisible(false);
         displayALabel.setManaged(false);
         //displayALabel.setWrapText(true);
-        //displayALabel.setText("We'll add more games in the future, thank you for your patience"); //add this to the futureGameButton listener
+        //displayALabel.setText("We'll add more games in the future, thank you for your patience"); //add this to the futureGameButton listener in gamemanager
 
         leftVBox.setAlignment(Pos.CENTER);
-        leftVBox.getChildren().addAll(displayALabel, gameIconHBox, welcomeLabel, randomGameQuote, snakeGameButton, blackJackButton, futureGameButton);
-
         leftVBox.setPrefWidth(290);
         leftVBox.setMaxWidth(380);
-        //leftVBox.setFillWidth(false); //don't stretch children horizontally (to make imageviewgameicon center)
+
+        leftVBox.getChildren().addAll(displayALabel, gameIconHBox, welcomeLabel, randomGameQuote, snakeGameButton, blackJackButton, futureGameButton);
 
         leftVBox.setStyle(
             "-fx-background-color: rgba(0, 0, 0, 1);" +  // dark semi-transparent card
@@ -160,8 +157,8 @@ public class MainMenuScreen extends BackgroundSetUp {
         constructHighScoreTable();
 
         rightVBox.getChildren().addAll(top5ScoresLabel, this.highScoreTable);
+        rightVBox.setMaxWidth(Double.MAX_VALUE);
         
-
         top5ScoresLabel.setStyle(
             "-fx-font-size: 18px;" +
             "-fx-font-weight: bold;" +
@@ -175,9 +172,6 @@ public class MainMenuScreen extends BackgroundSetUp {
             "-fx-padding: 20;" +
             "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 15, 0.3, 0, 4);"
         );
-
-        rightVBox.setMaxWidth(Double.MAX_VALUE);
-
     }
 
     public void constructHighScoreTable(){
@@ -225,10 +219,9 @@ public class MainMenuScreen extends BackgroundSetUp {
             "-fx-alignment: CENTER;" +
             "-fx-text-fill: #0077b6;"
         );
-    }
+    }//end of constructHighScoreTable()
 
     public void construct2HighscoreArrays(Path highScoresFilePath){
-
         if(Files.exists(highScoresFilePath) && Files.isReadable(highScoresFilePath)){
             try{
                 List<String> lines = Files.readAllLines(highScoresFilePath);
@@ -253,7 +246,7 @@ public class MainMenuScreen extends BackgroundSetUp {
         else{
             //files should always exists here and readable 
         }
-    }
+    }//end of construct2HighscoreArrays()
 
     public BorderPane getRootNode(){
         return rootBorderPane;
