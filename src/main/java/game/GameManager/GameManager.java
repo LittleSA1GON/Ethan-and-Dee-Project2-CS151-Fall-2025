@@ -10,6 +10,7 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ToolBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
@@ -20,8 +21,8 @@ public class GameManager extends Application{
     private Scene currScene;
     private Path userAccountsFilePath = Paths.get("user_accounts.txt");
     private Path highScoresFilePath = Paths.get("high_scores.txt");
+    private ToolBarC toolBarC;
 
-    
     @Override
     public void start(Stage stage){
         this.primaryStage = stage;
@@ -61,7 +62,6 @@ public class GameManager extends Application{
         /* TODO: if have time, add 1 more boolean and if not the first time logging in after registering, turn the label off, not here */
         //loginScreen.getSuccessfulLabel().setVisible(false);
         //loginScreen.getSuccessfulLabel().setManaged(false);
-        
     }
 
     public void createAndGoToCreateAccountScreenScene(){
@@ -75,11 +75,54 @@ public class GameManager extends Application{
 
     public void createAndGoToMainMenuScreenScene(String username){
         this.primaryStage.setTitle("Main Menu");
-        MainMenuScreen menuScreen = new MainMenuScreen(highScoresFilePath, username);
+
+        if(this.toolBarC == null){
+            createAToolBar(username);
+        }
+        MainMenuScreen menuScreen = new MainMenuScreen(highScoresFilePath, username, this.toolBarC);
         BorderPane menuScreenRootNode = menuScreen.getRootNode();
         currScene.setRoot(menuScreenRootNode);
 
         //TODO: attach listener to play games (2 buttons), main menu buttons
+        attachListenersToMainMenuScreenButtons(menuScreen);
+    }
+
+    public void attachListenersToMainMenuScreenButtons(MainMenuScreen menuScreen){
+        menuScreen.getSnakeGameButton().setOnAction(event -> {
+            menuScreen.getDispalyLabel().setVisible(false);
+            menuScreen.getDispalyLabel().setManaged(false);
+
+        });
+        menuScreen.getBlackjackButton().setOnAction(event -> {
+            menuScreen.getDispalyLabel().setVisible(false);
+            menuScreen.getDispalyLabel().setManaged(false);
+
+        });
+        menuScreen.getMoreGameComingButton().setOnAction(event -> {
+            menuScreen.getDispalyLabel().setText("We'll add more games in the future!");
+            menuScreen.getDispalyLabel().setVisible(true);
+            menuScreen.getDispalyLabel().setManaged(true);
+        });
+        
+    }
+
+    public void createAToolBar(String username){
+        this.toolBarC = new ToolBarC();
+        this.toolBarC.getJokeLabel().setVisible(false);
+        this.toolBarC.getJokeLabel().setManaged(false);
+        attachListenerToToolBarButtons(username);
+    }
+
+    public void attachListenerToToolBarButtons(String username){
+        this.toolBarC.getMainMenuButton().setOnAction(event -> {
+            this.toolBarC.getJokeLabel().setVisible(false);
+            this.toolBarC.getJokeLabel().setManaged(false);
+            createAndGoToMainMenuScreenScene(username);
+        });
+        this.toolBarC.getMoreButtonComing().setOnAction(event -> {
+            this.toolBarC.getJokeLabel().setVisible(true);
+            this.toolBarC.getJokeLabel().setManaged(true);
+        });
     }
 
     public void attachListnersToCreateAccountScreenButton(CreateAccountScreen createAccountScreen){
@@ -140,7 +183,6 @@ public class GameManager extends Application{
                     String[] parts = line.split(":", 2); //username = parts[0], password = parts[1]
                     if(username.equals(parts[0])){
                         if(pwd.equals(parts[1])){
-                            //TODO: use this user's info to go to his main menu
                             return true;
                         }
                         else{
@@ -151,7 +193,6 @@ public class GameManager extends Application{
                 }
                 userDoesSomethingWrongLabel.setText("No such user exists!");
                 return false;
-
             }catch(IOException e){
                 userDoesSomethingWrongLabel.setText("Error: " + e.getMessage());
                 return false;
