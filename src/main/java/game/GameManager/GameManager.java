@@ -22,7 +22,7 @@ import java.util.Optional;
 public class GameManager extends Application{
     private Stage primaryStage;
     private Scene currScene;
-    private Path userAccountsFilePath = Paths.get("txtfiles", "users.txt");
+    private Path userAccountsFilePath = Paths.get("txtfiles", "user_accounts.txt");
     private Path highScoresFilePath = Paths.get("txtfiles", "high_scores.txt");
     private ToolBarC toolBarC;
 
