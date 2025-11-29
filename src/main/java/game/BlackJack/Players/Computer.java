@@ -12,7 +12,7 @@ public class Computer extends Player implements Gambler{
         this.username = username;
         this.game = game;
         this.money = 1000;
-        this.personality = selectRandomCompPersonalities();
+        this.personality = personality;
     }
 
 

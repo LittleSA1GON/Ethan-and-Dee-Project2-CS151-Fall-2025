@@ -39,43 +39,42 @@ public abstract class Player {
         for (Card card : hand) {
             Rank rank = card.getRank();
             switch (rank) {
-                case TWO: {
+                case TWO:
                     score += 2;
-                } 
-                case THREE: {
+                    break;
+                case THREE:
                     score += 3;
-                }
-                case FOUR: {
+                    break;
+                case FOUR:
                     score += 4;
-                }
-                case FIVE: {
+                    break;
+                case FIVE:
                     score += 5;
-                }
-                case SIX: {
+                    break;
+                case SIX:
                     score += 6;
-                }
-                case SEVEN: {
+                    break;
+                case SEVEN:
                     score += 7;
-                }
-                case EIGHT: {
+                    break;
+                case EIGHT:
                     score += 8;
-                }
-                case NINE: {
+                    break;
+                case NINE:
                     score += 9;
-                }
-                case TEN: 
-                case JACK: 
-                case QUEEN: 
-                case KING: {
+                    break;
+                case TEN:
+                case JACK:
+                case QUEEN:
+                case KING:
                     score += 10;
-                }
-                case ACE: {
+                    break;
+                case ACE:
                     score += 11;
                     aceCount++;
-                }
-                default: { 
-                    break; 
-                }
+                    break;
+                default:
+                    break;
             }
         }
         while (score > 21 && aceCount > 0) {
@@ -150,6 +149,7 @@ public abstract class Player {
 
     public void winBet() {
         money += (betAmount * 2); 
+        betAmount = 0;
     }
 
     public void loseBet() {
@@ -161,10 +161,7 @@ public abstract class Player {
 
     public void tieRound() {
         money += betAmount;
-    }
-
-    public void blackJackBet() {
-        money += betAmount * 1.5;
+        betAmount = 0;
     }
 
     public boolean hasStood() {

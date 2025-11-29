@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 import game.snake.SnakeGame;
+import game.blackjack.gamelogic.BlackJackApp;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -104,14 +105,13 @@ public class GameManager extends Application{
         menuScreen.getBlackjackButton().setOnAction(event -> {
             menuScreen.getDispalyLabel().setVisible(false);
             menuScreen.getDispalyLabel().setManaged(false);
-            //TODO: Ethan -> use these
-            /* 
-             *BlackJack blackjack = new BlackJack(highScoresFilePath, username, this.toolBarC);
-             *blackjack.startGame();
-             *
-             * YourRootNodeType blackjackRootNode = blackjack.getRootNode();
-             * currScene.setRoot(blackjackRootNode);
-            */
+            this.primaryStage.setTitle("Blackjack");
+            try {
+                BlackJackApp blackjackApp = new BlackJackApp(username);
+                blackjackApp.startGame(primaryStage, toolBarC.getToolBar(), blackjackApp.createGameSceneWithCustomToolbar(toolBarC.getToolBar()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
         menuScreen.getMoreGameComingButton().setOnAction(event -> {
             menuScreen.getDispalyLabel().setText("We'll add more games in the future!");

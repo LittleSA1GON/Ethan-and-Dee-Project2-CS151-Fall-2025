@@ -13,7 +13,7 @@ public class ToolBarC {
 
     public ToolBarC(){
         mainMenuButton = new Button("Main Menu");
-        moreButtonComing = new Button("more buttons coming");
+        moreButtonComing = new Button("More Buttons Coming");
         jokeLabel.setVisible(false);
         jokeLabel.setManaged(false);
         toolBar = new ToolBar(mainMenuButton, moreButtonComing, titleLabel, jokeLabel);
