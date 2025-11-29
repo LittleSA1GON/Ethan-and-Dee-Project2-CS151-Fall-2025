@@ -14,6 +14,11 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
+import java.util.Optional;
+
 public class GameManager extends Application{
     private Stage primaryStage;
     private Scene currScene;
@@ -141,6 +146,40 @@ public class GameManager extends Application{
             this.toolBarC.getJokeLabel().setManaged(false);
             createAndGoToMainMenuScreenScene(username);
         });
+
+        this.toolBarC.getLogoutButton().setOnAction(event -> {
+            MusicManager.stopAllMusic();
+            createAndGoToFirstScreenScene();
+            this.toolBarC = null;
+        });
+
+        this.toolBarC.getDeleteAccountButton().setOnAction(event -> {
+            Alert confirm = new Alert(AlertType.CONFIRMATION);
+            confirm.setTitle("Delete Account");
+            confirm.setHeaderText("Delete account \"" + username + "\"?");
+            confirm.setContentText("This will remove your saved scores and blackjack saves. This cannot be undone.");
+            Optional<ButtonType> result = confirm.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                try {
+                    FileManager.deleteUserAccount(username);
+                    FileManager.deleteUserHighScores(username);
+                    FileManager.deleteAllBlackjackSaves(username);
+                } 
+                catch (IOException e) {
+                    Alert errorAlert = new Alert(AlertType.ERROR);
+                    errorAlert.setTitle("Error");
+                    errorAlert.setHeaderText("Failed to delete account");
+                    errorAlert.setContentText(e.getMessage());
+                    errorAlert.showAndWait();
+                    return;
+                }
+
+                MusicManager.stopAllMusic();
+                createAndGoToFirstScreenScene();
+                this.toolBarC = null;
+            }
+        });
+
         this.toolBarC.getMoreButtonComing().setOnAction(event -> {
             this.toolBarC.getJokeLabel().setVisible(true);
             this.toolBarC.getJokeLabel().setManaged(true);

@@ -291,4 +291,27 @@ public class FileManager {
         }
         return sb.toString();
     }
+    public static void deleteUserAccount(String username) throws IOException {
+        init();
+        List<String> lines = Files.readAllLines(USERS_FILE, StandardCharsets.UTF_8);
+        lines.removeIf(line -> line.startsWith(username + ":"));
+        Files.write(USERS_FILE, lines, StandardCharsets.UTF_8);
+    }
+
+    public static void deleteUserHighScores(String username) throws IOException {
+        init();
+        List<String> lines = Files.readAllLines(HIGHSCORES_FILE, StandardCharsets.UTF_8);
+        lines.removeIf(line -> line.startsWith(username + ":"));
+        Files.write(HIGHSCORES_FILE, lines, StandardCharsets.UTF_8);
+    }
+
+    public static void deleteAllBlackjackSaves(String username) throws IOException {
+        init();
+        if (!Files.exists(BLACKJACK_FILE)) {
+            return;
+        }
+        List<String> lines = Files.readAllLines(BLACKJACK_FILE, StandardCharsets.UTF_8);
+        lines.removeIf(line -> line.startsWith(username + ":"));
+        Files.write(BLACKJACK_FILE, lines, StandardCharsets.UTF_8);
+    }
 }

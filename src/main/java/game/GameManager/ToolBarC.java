@@ -7,6 +7,8 @@ import javafx.scene.control.ToolBar;
 public class ToolBarC {
     private ToolBar toolBar;
     private Button mainMenuButton;
+    private Button logoutButton;
+    private Button deleteAccountButton;
     private Button moreButtonComing;
     private Label titleLabel = new Label("Game Hub");
     private Label jokeLabel = new Label("Don't click this, you are making me sad");
@@ -14,9 +16,11 @@ public class ToolBarC {
     public ToolBarC(){
         mainMenuButton = new Button("Main Menu");
         moreButtonComing = new Button("More Buttons Coming");
+        logoutButton = new Button("Logout");
+        deleteAccountButton = new Button("Delete Account");
         jokeLabel.setVisible(false);
         jokeLabel.setManaged(false);
-        toolBar = new ToolBar(mainMenuButton, moreButtonComing, titleLabel, jokeLabel);
+        toolBar = new ToolBar(mainMenuButton, logoutButton, deleteAccountButton, moreButtonComing, titleLabel, jokeLabel);
         makeDesignBetter();
     }
 
@@ -26,6 +30,12 @@ public class ToolBarC {
     public Button getMainMenuButton(){
         return this.mainMenuButton;
     }
+    public Button getLogoutButton(){
+        return this.logoutButton;
+    }
+    public Button getDeleteAccountButton(){
+        return this.deleteAccountButton;
+    }
     public Button getMoreButtonComing(){
         return this.moreButtonComing;
     }
@@ -34,6 +44,28 @@ public class ToolBarC {
     }
     public void makeDesignBetter(){
         this.mainMenuButton.setStyle(
+            "-fx-background-color: linear-gradient(#00b4d8, #0077b6);" +
+            "-fx-text-fill: white;" +
+            "-fx-font-weight: bold;" +
+            "-fx-background-radius: 10;" +
+            "-fx-padding: 6 16 6 16;" +
+            "-fx-border-color: rgba(255,255,255,0.25);" +
+            "-fx-border-width: 1;" +
+            "-fx-border-radius: 10;" +
+            "-fx-cursor: hand;"
+        );
+        this.logoutButton.setStyle(
+            "-fx-background-color: linear-gradient(#00b4d8, #0077b6);" +
+            "-fx-text-fill: white;" +
+            "-fx-font-weight: bold;" +
+            "-fx-background-radius: 10;" +
+            "-fx-padding: 6 16 6 16;" +
+            "-fx-border-color: rgba(255,255,255,0.25);" +
+            "-fx-border-width: 1;" +
+            "-fx-border-radius: 10;" +
+            "-fx-cursor: hand;"
+        );
+        this.deleteAccountButton.setStyle(
             "-fx-background-color: linear-gradient(#00b4d8, #0077b6);" +
             "-fx-text-fill: white;" +
             "-fx-font-weight: bold;" +
