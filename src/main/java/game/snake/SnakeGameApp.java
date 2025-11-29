@@ -1,6 +1,5 @@
 package game.snake;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import javafx.application.Application;

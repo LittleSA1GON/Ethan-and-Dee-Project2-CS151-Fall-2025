@@ -1,11 +1,9 @@
 package game.gamemanager;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.util.List;
+import java.security.NoSuchAlgorithmException;
 import game.snake.SnakeGame;
 import game.blackjack.gamelogic.BlackJackApp;
 import javafx.application.Application;
@@ -19,8 +17,8 @@ import javafx.stage.Stage;
 public class GameManager extends Application{
     private Stage primaryStage;
     private Scene currScene;
-    private Path userAccountsFilePath = Paths.get("user_accounts.txt");
-    private Path highScoresFilePath = Paths.get("high_scores.txt");
+    private Path userAccountsFilePath = Paths.get("txtfiles", "users.txt");
+    private Path highScoresFilePath = Paths.get("txtfiles", "high_scores.txt");
     private ToolBarC toolBarC;
 
     //private int[] snakeGameScores; 
@@ -36,6 +34,9 @@ public class GameManager extends Application{
         currScene = new Scene(firstScreenRootNode, 800, 600);
         primaryStage.setTitle("Welcome Page");
         primaryStage.setScene(currScene);
+        
+        // Start GameManager music on application startup
+        MusicManager.playGameManagerMusic();
 
         attachListenersToFirstScreenButtons(firstScreen.getLoginButton(), firstScreen.getCreateAccountButton());
 
@@ -62,6 +63,7 @@ public class GameManager extends Application{
             loginScreen.addSuccessfulRegistrationToVBox(); //since user goes to the login page after successful registeration 
         }
         attachListenersToLoginScreenButton(loginScreen);
+        attachBackButtonListenerToLoginScreen(loginScreen);
         /* TODO: if have time, add 1 more boolean and if not the first time logging in after registering, turn the label off, not here */
         //loginScreen.getSuccessfulLabel().setVisible(false);
         //loginScreen.getSuccessfulLabel().setManaged(false);
@@ -74,11 +76,13 @@ public class GameManager extends Application{
         currScene.setRoot(createAccountScreenRootNode);
 
         attachListnersToCreateAccountScreenButton(createAccountScreen);
+        attachBackButtonListenerToCreateAccount(createAccountScreen);
     }
 
     public void createAndGoToMainMenuScreenScene(String username){
         this.primaryStage.setTitle("Main Menu");
-
+        MusicManager.stopAllMusic();
+        MusicManager.playGameManagerMusic();
         if(this.toolBarC == null){
             createAToolBar(username);
         }
@@ -95,6 +99,8 @@ public class GameManager extends Application{
             menuScreen.getDispalyLabel().setVisible(false);
             menuScreen.getDispalyLabel().setManaged(false);
             this.primaryStage.setTitle("Snake Game");
+            MusicManager.stopGameManagerMusic();
+            MusicManager.playSnakeMusic();
             SnakeGame snakeGame = new SnakeGame(highScoresFilePath, snakeGameScores, username, this.toolBarC);
             snakeGame.startGame(); 
 
@@ -106,6 +112,8 @@ public class GameManager extends Application{
             menuScreen.getDispalyLabel().setVisible(false);
             menuScreen.getDispalyLabel().setManaged(false);
             this.primaryStage.setTitle("Blackjack");
+            MusicManager.stopGameManagerMusic();
+            MusicManager.playBlackjackMusic();
             try {
                 BlackJackApp blackjackApp = new BlackJackApp(username);
                 blackjackApp.startGame(primaryStage, toolBarC.getToolBar(), blackjackApp.createGameSceneWithCustomToolbar(toolBarC.getToolBar()));
@@ -157,9 +165,9 @@ public class GameManager extends Application{
             }
 
             try{
-                Files.writeString(userAccountsFilePath, usernameString + ":" + pwdString + "\n", StandardOpenOption.APPEND, StandardOpenOption.CREATE);
-                Files.writeString(highScoresFilePath, usernameString + ":0:0:0:0:0:0:0:0:0:0" + "\n" , StandardOpenOption.APPEND, StandardOpenOption.CREATE); //TODO: Look, this is how everyuser's top 5 scores for both game is initialized 
-            }catch (IOException e){
+                FileManager.saveUserAccount(usernameString, pwdString);
+                FileManager.initUserHighScores(usernameString);
+            }catch (IOException | NoSuchAlgorithmException e){
                 userDoesSomethingWrongLabel.setText("Error: " + e.getMessage());
                 userDoesSomethingWrongLabel.setVisible(true);
                 userDoesSomethingWrongLabel.setManaged(true);
@@ -190,32 +198,40 @@ public class GameManager extends Application{
     }
 
     public boolean checkLoggingInUsername(String username, String pwd, Label userDoesSomethingWrongLabel){
-        if(Files.exists(userAccountsFilePath) && Files.isReadable(userAccountsFilePath)){
-            try{
-                List<String> lines = Files.readAllLines(userAccountsFilePath);
-                for(String line : lines){
-                    String[] parts = line.split(":", 2); //username = parts[0], password = parts[1]
-                    if(username.equals(parts[0])){
-                        if(pwd.equals(parts[1])){
-                            return true;
-                        }
-                        else{
-                            userDoesSomethingWrongLabel.setText("Incorrect Username or password"); //wrong password, but use generic message for security reasons
-                            return false; //can return (unique usernames)
-                        }
-                    }
-                }
-                userDoesSomethingWrongLabel.setText("No such user exists!");
-                return false;
-            }catch(IOException e){
-                userDoesSomethingWrongLabel.setText("Error: " + e.getMessage());
-                return false;
+        try {
+            boolean ok = FileManager.verifyUserAccount(username, pwd);
+            if (!ok) {
+                userDoesSomethingWrongLabel.setText("Incorrect Username or password");
             }
+            return ok;
+        } catch (Exception e) {
+            userDoesSomethingWrongLabel.setText("Error: " + e.getMessage());
+            return false;
         }
-        else{
-            userDoesSomethingWrongLabel.setText("No such user exists!"); //no file exists -> no user has registered yet
-                return false;
+    }
+
+    private void attachBackButtonListenerToLoginScreen(LoginScreen loginScreen){
+        loginScreen.getBackButton().setOnAction(event -> {
+            createAndGoToFirstScreenScene();
+        });
+    }
+
+    private void attachBackButtonListenerToCreateAccount(CreateAccountScreen createAccountScreen){
+        createAccountScreen.getBackButton().setOnAction(event -> {
+            createAndGoToFirstScreenScene();
+        });
+    }
+
+    public void createAndGoToFirstScreenScene(){
+        this.primaryStage.setTitle("Welcome Page");
+        // Only start music if it's not already playing
+        if (!MusicManager.isGameManagerMusicPlaying()) {
+            MusicManager.playGameManagerMusic();
         }
+        FirstScreen firstScreen = new FirstScreen();
+        StackPane firstScreenRootNode = firstScreen.getRootNode();
+        currScene.setRoot(firstScreenRootNode);
+        attachListenersToFirstScreenButtons(firstScreen.getLoginButton(), firstScreen.getCreateAccountButton());
     }
 
     public static void main(String[] args){

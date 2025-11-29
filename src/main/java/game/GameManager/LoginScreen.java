@@ -5,6 +5,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
@@ -15,6 +16,7 @@ public class LoginScreen extends BackgroundSetUp {
     private TextField pwdTF;
 
     private Button loginButton;
+    private Button backButton;
 
     private Label successfulLabel = new Label ("Account is created successcully!, please log in");
     private Label userDoesSomethingWrongLabel;
@@ -85,7 +87,17 @@ public class LoginScreen extends BackgroundSetUp {
             "-fx-text-fill: white;"
         );
 
-        loginVBox.getChildren().addAll(pleaseLogin, usernameTF, pwdTF, userDoesSomethingWrongLabel, successfulLabel, loginButton);
+        this.backButton = new Button("Back");
+        this.backButton.setMaxWidth(Double.MAX_VALUE);
+        this.backButton.setStyle(
+            "-fx-background-color: #cccccc;" +
+            "-fx-text-fill: black;"
+        );
+
+        HBox buttonBox = new HBox(10, loginButton, backButton);
+        buttonBox.setMaxWidth(Double.MAX_VALUE);
+
+        loginVBox.getChildren().addAll(pleaseLogin, usernameTF, pwdTF, userDoesSomethingWrongLabel, successfulLabel, buttonBox);
     }
 
     public void addSuccessfulRegistrationToVBox(){
@@ -97,6 +109,9 @@ public class LoginScreen extends BackgroundSetUp {
     }
     public Button getLoginButton(){
         return this.loginButton;
+    }
+    public Button getBackButton(){
+        return this.backButton;
     }
     public TextField getUsernameTF(){
         return this.usernameTF;

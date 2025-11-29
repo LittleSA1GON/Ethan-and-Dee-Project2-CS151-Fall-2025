@@ -20,6 +20,7 @@ import game.blackjack.players.Dealer;
 import game.blackjack.players.CompPersonalities;
 import java.util.Random;
 import game.blackjack.gamelogic.gameenums.GameState;
+import game.gamemanager.FileManager;
 
 public class BlackJackGame {
     private Stack<Card> shuffledDeck;
@@ -32,6 +33,7 @@ public class BlackJackGame {
     private GameState gameState;
     private int currentPlayerIndex;
     private String lastStatusMessage;
+    private int maxMoneyReached;
     private static final String SAVE_FILE = "txtfiles/BlackJackSave.txt";
 
     public BlackJackGame(String username) {
@@ -47,6 +49,7 @@ public class BlackJackGame {
         this.dealer = new Dealer(this);
         this.players = new ArrayList<>();
         this.lastStatusMessage = "Game initialized";
+        this.maxMoneyReached = this.humanPlayer.getMoney();
         initializePlayers();
         initializeDeck();
     }
@@ -57,6 +60,34 @@ public class BlackJackGame {
         this.players = new ArrayList<>();
         if (isLoading) {
             String saveStateString = loadFromFile();
+            loadFromSaveState(saveStateString);
+        } 
+        else {
+            Random rnd = new Random();
+            CompPersonalities[] vals = CompPersonalities.values();
+            CompPersonalities p1 = vals[rnd.nextInt(vals.length)];
+            CompPersonalities p2 = vals[rnd.nextInt(vals.length)];
+            this.humanPlayer = new Human(username, this);
+            this.computerPlayer1 = new Computer("Computer 1", p1, this);
+            this.computerPlayer2 = new Computer("Computer 2", p2, this);
+            this.dealer = new Dealer(this);
+            initializePlayers();
+        }
+        initializeDeck();
+    }
+
+    /**
+     * Construct and load from per-user encrypted save using provided password.
+     */
+    public BlackJackGame(String username, boolean isLoading, String password) throws Exception {
+        this.shuffledDeck = new Stack<>();
+        this.unshuffledDeck = new ArrayList<>();
+        this.players = new ArrayList<>();
+        if (isLoading) {
+            String saveStateString = FileManager.loadBlackjackSave(username, password);
+            if (saveStateString == null) {
+                throw new Exception("No save found for user or incorrect password");
+            }
             loadFromSaveState(saveStateString);
         } 
         else {
@@ -103,6 +134,12 @@ public class BlackJackGame {
         Collections.shuffle(unshuffledDeck);
         shuffledDeck.addAll(unshuffledDeck);
         unshuffledDeck.clear();
+        if (lastStatusMessage == null || lastStatusMessage.isEmpty()) {
+        lastStatusMessage = "Deck reshuffled.";
+        } 
+        else {
+            lastStatusMessage += "\nDeck reshuffled.";
+        }
     }
 
     public void readDeck(){
@@ -138,14 +175,27 @@ public class BlackJackGame {
 
     public void dealInitialCards() {
         dealer.addCard(dealCard());
-        humanPlayer.addCard(dealCard());
-        computerPlayer1.addCard(dealCard());
-        computerPlayer2.addCard(dealCard());
+
+        if (humanPlayer.getBetAmount() > 0) {
+            humanPlayer.addCard(dealCard());
+        }
+        if (computerPlayer1.getBetAmount() > 0) {
+            computerPlayer1.addCard(dealCard());
+        }
+        if (computerPlayer2.getBetAmount() > 0) {
+            computerPlayer2.addCard(dealCard());
+        }
         
         dealer.addCard(dealCard());
-        humanPlayer.addCard(dealCard());
-        computerPlayer1.addCard(dealCard());
-        computerPlayer2.addCard(dealCard());
+        if (humanPlayer.getBetAmount() > 0) {
+            humanPlayer.addCard(dealCard());
+        }
+        if (computerPlayer1.getBetAmount() > 0) {
+            computerPlayer1.addCard(dealCard());
+        }
+        if (computerPlayer2.getBetAmount() > 0) {
+            computerPlayer2.addCard(dealCard());
+        }
         
         gameState = GameState.PLAYER_TURN;
         lastStatusMessage = "Cards dealt. " + humanPlayer.getUsername() + " to play.";
@@ -218,8 +268,14 @@ public class BlackJackGame {
         currentPlayerIndex++;
         if (currentPlayerIndex < players.size() - 1) {
             Player nextPlayer = players.get(currentPlayerIndex);
-            if (nextPlayer.getMoney() <= 0 || nextPlayer.getBetAmount() == 0) {
-                moveToNextPlayer();
+            // Skip players who are bankrupt or have no bet
+            while (currentPlayerIndex < players.size() - 1 && (nextPlayer.getMoney() <= 0 || nextPlayer.getBetAmount() == 0)) {
+                currentPlayerIndex++;
+                nextPlayer = players.get(currentPlayerIndex);
+            }
+            // If we've reached the dealer or beyond, start dealer turn
+            if (currentPlayerIndex >= players.size() - 1) {
+                dealerTurn();
             }
         } 
         else {
@@ -277,6 +333,11 @@ public class BlackJackGame {
         }
         
         lastStatusMessage = results.toString();
+        
+        if (humanPlayer.getMoney() > maxMoneyReached) {
+            maxMoneyReached = humanPlayer.getMoney();
+        }
+        
         checkGameOver();
     }
 
@@ -299,6 +360,7 @@ public class BlackJackGame {
         
         state.gameState = gameState.toString();
         state.currentPlayerIndex = currentPlayerIndex;
+        state.maxMoneyReached = maxMoneyReached;
         state.humanUsername = humanPlayer.getUsername();
         state.humanScore = humanPlayer.getCurrScore();
         state.humanMoney = humanPlayer.getMoney();
@@ -348,6 +410,7 @@ public class BlackJackGame {
 
         gameState = GameState.valueOf(state.gameState);
         currentPlayerIndex = state.currentPlayerIndex;
+        maxMoneyReached = state.maxMoneyReached;
 
         humanPlayer = new Human(state.humanUsername, this);
         humanPlayer.setCurrScore(state.humanScore);
@@ -381,7 +444,13 @@ public class BlackJackGame {
         dealer.setHasStood(state.dealerHasStood);
         dealer.setHasBusted(state.dealerHasBusted);
 
-        initializePlayers();
+        // Populate players list without resetting gameState (preserve loaded state)
+        players.clear();
+        players.add(humanPlayer);
+        players.add(computerPlayer1);
+        players.add(computerPlayer2);
+        players.add(dealer);
+        
         lastStatusMessage = "Game loaded from save state!";
     }
 
@@ -430,13 +499,22 @@ public class BlackJackGame {
 
     public void setLastStatusMessage(String msg) { this.lastStatusMessage = msg; }
     public boolean isGameOver() {
-        return humanPlayer.getIsBankrupt();
+        return humanPlayer.getMoney() <= 0;
+    }
+
+    public int getHumanPlayerMoney() {
+        return humanPlayer.getMoney();
+    }
+
+    public int getMaxMoneyReached() {
+        return maxMoneyReached;
     }
 
     public static class SaveState {
         public String gameState;
         public int currentPlayerIndex;
         public String humanUsername;
+        public int maxMoneyReached;
         
         public int humanScore;
         public int humanMoney;

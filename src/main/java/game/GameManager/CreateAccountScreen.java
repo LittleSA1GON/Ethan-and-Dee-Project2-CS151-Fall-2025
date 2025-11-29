@@ -9,6 +9,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
@@ -19,6 +20,7 @@ public class CreateAccountScreen extends BackgroundSetUp{
     private TextField pwdTF;
 
     private Button createAccountButton;
+    private Button backButton;
 
     private Label userDoesSomethingWrongLabel;
 
@@ -65,13 +67,6 @@ public class CreateAccountScreen extends BackgroundSetUp{
             "-fx-prompt-text-fill: black;" 
         );
 
-        this.createAccountButton = new Button("Sign Up");
-        this.createAccountButton.setMaxWidth(Double.MAX_VALUE); // fill the vBox width
-        this.createAccountButton.setStyle(
-            "-fx-background-color: #ff0066;" +
-            "-fx-text-fill: white;"
-        );
-
         userDoesSomethingWrongLabel = new Label();
         userDoesSomethingWrongLabel.setVisible(false);
         userDoesSomethingWrongLabel.setManaged(false); //don't take up layout space
@@ -80,8 +75,25 @@ public class CreateAccountScreen extends BackgroundSetUp{
         userDoesSomethingWrongLabel.setStyle(
             "-fx-text-fill: red;"
         );
+
+        this.createAccountButton = new Button("Sign Up");
+        this.createAccountButton.setMaxWidth(Double.MAX_VALUE); // fill the vBox width
+        this.createAccountButton.setStyle(
+            "-fx-background-color: #ff0066;" +
+            "-fx-text-fill: white;"
+        );
+
+        this.backButton = new Button("Back");
+        this.backButton.setMaxWidth(Double.MAX_VALUE);
+        this.backButton.setStyle(
+            "-fx-background-color: #cccccc;" +
+            "-fx-text-fill: black;"
+        );
+
+        HBox buttonBox = new HBox(10, createAccountButton, backButton);
+        buttonBox.setMaxWidth(Double.MAX_VALUE);
         
-        createAccountVBox.getChildren().addAll(pleaseSignUp, usernameTF, pwdTF, userDoesSomethingWrongLabel, createAccountButton);
+        createAccountVBox.getChildren().addAll(pleaseSignUp, usernameTF, pwdTF, userDoesSomethingWrongLabel, buttonBox);
     }
 
     public boolean isValidUsername(String username, Path userAccountsFilePath){
@@ -151,6 +163,9 @@ public class CreateAccountScreen extends BackgroundSetUp{
     
     public Button getCreateAccountButton(){
         return this.createAccountButton;
+    }
+    public Button getBackButton(){
+        return this.backButton;
     }
     public TextField getUsernameTF(){
         return this.usernameTF;

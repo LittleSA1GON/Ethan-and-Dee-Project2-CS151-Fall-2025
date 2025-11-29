@@ -1,13 +1,13 @@
 package game.snake;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import game.gamemanager.BackgroundSetUp;
+import game.gamemanager.FileManager;
 import game.gamemanager.ToolBarC;
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Insets;
@@ -31,7 +31,6 @@ public class SnakeGame extends BackgroundSetUp {
     private Label currScoreLabel = new Label(); //restart from 0 everytime game restarts -->use currScoreLabel.setText(String.valueOf(newScore)); to update it with real time
     private int score = 0;
     private VBox vBox; //top = toolbar, right beneath the toolbar = score (Hbox), the rest = canvas
-    private ToolBarC toolBarC;
 
     private StackPane stackPaneRoot;
     private BorderPane borderPane;
@@ -43,13 +42,11 @@ public class SnakeGame extends BackgroundSetUp {
     private Button restartButton = new Button("Play Again");
 
     private int[] snakeGameScores;
-    private Path highScoresFilePath;
     private String username;
 
     private Canvas canvas;
     private GraphicsContext gc;
     private final int CELL_SIZE = 28; 
-    private int[][] gridCanvas; 
     private Random random = new Random(); 
     private List<SnakeBody> snake = new ArrayList<>();
     private Direction currDirection = Direction.RIGHT;
@@ -69,9 +66,7 @@ public class SnakeGame extends BackgroundSetUp {
     private ImageView pauseOverlay = new ImageView(gamePauseImage);
 
     public SnakeGame(Path highestScoresFilePath, int[] snakeGameScores, String username, ToolBarC toolBarC){ 
-        this.toolBarC = toolBarC; 
         this.snakeGameScores = snakeGameScores;
-        this.highScoresFilePath = highestScoresFilePath;
         this.username = username;
         this.scoreHBox = initScoreHBox(); //incorporating abstraction everywhere possible to make code readable
         this.canvas = constructCanvas(); 
@@ -140,8 +135,6 @@ public class SnakeGame extends BackgroundSetUp {
     private Canvas constructCanvas(){
         Canvas canvasL = new Canvas(700, 448);
         this.gc = canvasL.getGraphicsContext2D();
-
-        this.gridCanvas = new int[448 / CELL_SIZE][700 / CELL_SIZE]; //first index = row, second index = column 
 
         gc.setFill(Color.web("#b38effff"));
         gc.fillRect(0, 0, canvasL.getWidth(), canvasL.getHeight());
@@ -372,14 +365,19 @@ public class SnakeGame extends BackgroundSetUp {
     }//end of updateSnakeArrayList
 
     public void updateStateSinceFoodIsEaten(){
-        this.score++;
+        this.score += 100;  // 100 points per fruit
         currScoreLabel.setText(String.valueOf(this.score));
         createFood();
     }
 
     public void gameOver(){
         if(needToUpdateSnakeGameScoresArray(this.score)){  //Instantly write to the file here so that even when user close the program after the game is over, the file will always get updated 
-            writeToFile();
+            try {
+                FileManager.updateAllSnakeScores(username, snakeGameScores);
+            } catch (IOException e) {
+                System.err.println("Error updating snake scores: " + e.getMessage());
+                e.printStackTrace();
+            }
         }
         this.animationTimer.stop();
         this.isGameOver = true;
@@ -390,39 +388,6 @@ public class SnakeGame extends BackgroundSetUp {
 
         displayScoreOnGameOver();
     }//end of gameover()
-
-    private void writeToFile(){
-        if(Files.exists(highScoresFilePath) && Files.isReadable(highScoresFilePath) && Files.isWritable(highScoresFilePath)){
-            try{
-                List<String> lines = Files.readAllLines(highScoresFilePath);
-                for(int i=0; i < lines.size(); i++) {
-                    String line = lines.get(i);
-                    String[] parts = line.split(":", 11);
-                    if(parts[0].equals(this.username)){
-                        //update this user's snake game scores
-                        String updatedString = 
-                        parts[0] + ":" +
-                        snakeGameScores[0] + ":" +
-                        snakeGameScores[1] + ":" +
-                        snakeGameScores[2] + ":" +
-                        snakeGameScores[3] + ":" +
-                        snakeGameScores[4] + ":" +
-                        parts[6] + ":" +
-                        parts[7] + ":" +
-                        parts[8] + ":" +
-                        parts[9] + ":" +
-                        parts[10];
-                        lines.set(i, updatedString);
-                        break;
-                    }
-                }
-                Files.write(highScoresFilePath, lines); //replace the old high_scores.txt
-            }catch(IOException e){
-                System.out.println("Failed to update high scores."); //should not happen TT
-                e.printStackTrace();
-            }
-        }
-    }
 
     public void displayScoreOnGameOver(){
 

@@ -24,8 +24,9 @@ import javafx.scene.image.ImageView;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.Path;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import game.blackjack.gamelogic.BlackJackGame.SaveState;
+import javafx.scene.control.PasswordField;
+import javafx.stage.Modality;
+import game.gamemanager.FileManager;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 import javafx.util.Duration;
@@ -44,13 +45,13 @@ import game.blackjack.supportingfiles.cardenums.*;
 public class BlackJackApp extends Application {
     private BlackJackGame game;
     private String username;
-    private Stage primaryStage;
     private ToolBar toolbarc;
     private Scene gameScene;
-    private static final int CARD_DELAY_MS = 60; 
+    private static final int CARD_DELAY_MS = 60;
+    private static final int COMPUTER_TURN_DELAY_MS = 2000;  // 2 second delay between computer decisions 
 
     private BorderPane contentPane;
-    private VBox gameArea;
+    private Pane gameArea;
 
     private Label statusLabel;
     private TextArea gameLogArea;
@@ -71,7 +72,6 @@ public class BlackJackApp extends Application {
     private Label comp1NameLabel;
     private Label comp2NameLabel;
     private Label dealerNameLabel;
-    private Label dealerBetLabel;
     private Label comp1BetLabel;
     private Label comp2BetLabel;
     private Label humanBetLabel;
@@ -101,7 +101,6 @@ public class BlackJackApp extends Application {
     }
 
     public void startGame(Stage primaryStage, ToolBar toolbarc, BorderPane root) {
-        this.primaryStage = primaryStage;
         this.toolbarc = toolbarc;
 
         BorderPane blackjackRoot = createGameSceneWithCustomToolbar(toolbarc);
@@ -120,7 +119,6 @@ public class BlackJackApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        this.primaryStage = primaryStage;
         primaryStage.setTitle("BlackJack");
         primaryStage.setWidth(1200);
         primaryStage.setHeight(800);
@@ -277,7 +275,8 @@ public class BlackJackApp extends Application {
             game = new BlackJackGame(username);
             showInGameButtons();
             switchToGameArea();
-        } catch (Exception e) {
+        } 
+        catch (Exception e) {
             e.printStackTrace();
             showAlert("Error starting new game: " + e.getMessage());
         }
@@ -289,10 +288,16 @@ public class BlackJackApp extends Application {
                 showAlert("No saved game found for user: " + username);
                 return;
             }
-            game = new BlackJackGame(username, true);
+            String pwd = promptForPassword("Enter account password to load save:");
+            if (pwd == null) {
+                showAlert("Load cancelled.");
+                return;
+            }
+            game = new BlackJackGame(username, true, pwd);
             showInGameButtons();
             switchToGameArea();
-        } catch (Exception e) {
+        } 
+        catch (Exception e) {
             showAlert("Error loading game: " + e.getMessage());
         }
     }
@@ -305,12 +310,22 @@ public class BlackJackApp extends Application {
         contentPane.setCenter(gameArea);
     }
 
+    private void switchToPreGameArea() {
+        if (contentPane == null) {
+            return;
+        }
+        game = null;
+        gameArea = createPreGameCenter();
+        contentPane.setCenter(gameArea);
+        showPreGameButtons();
+    }
+
     private VBox createGameArea() {
         VBox mainArea = new VBox(10);
         mainArea.setPadding(new Insets(15));
         mainArea.setStyle("-fx-background-color: transparent;");
         
-        statusLabel = new Label("Starting game...");
+        statusLabel = new Label(game.getLastStatusMessage() != null ? game.getLastStatusMessage() : "Starting game...");
         statusLabel.setStyle("-fx-font-size: 32; -fx-font-weight: bold; -fx-text-fill: white;");
 
         gameLogArea = new TextArea();
@@ -339,8 +354,60 @@ public class BlackJackApp extends Application {
         }
 
         mainArea.getChildren().addAll(statusLabel, gameLogArea, dealerBox, middleSection, humanBox, controlArea);
+        updateUI();
+        restoreControlsForGameState();
         return mainArea;
     }
+    private void restoreControlsForGameState() {
+        if (game == null) {
+            return;
+        }
+
+        // These may be null early in setup; be defensive.
+        if (betChoiceBox == null || saveBetButton == null ||
+            hitButton == null || standButton == null) {
+            return;
+        }
+
+        // Default: disable all action buttons
+        hitButton.setDisable(true);
+        standButton.setDisable(true);
+
+        GameState state = game.getGameState();
+
+        switch (state) {
+            case NEW_ROUND:
+                // Player needs to place bets
+                betChoiceBox.setDisable(false);
+                saveBetButton.setDisable(false);
+                break;
+
+            case PLAYER_TURN:
+                // Bets already placed, so disable betting controls
+                betChoiceBox.setDisable(true);
+                saveBetButton.setDisable(true);
+
+                // Enable Hit/Stand only if it's the human's turn and they’re still live
+                if (game.getCurrentPlayer() == game.getHumanPlayer()
+                        && !game.getHumanPlayer().hasBusted()
+                        && !game.getHumanPlayer().hasStood()) {
+                    hitButton.setDisable(false);
+                    standButton.setDisable(false);
+                }
+                break;
+
+            case DEALER_TURN:
+            case ROUND_OVER:
+            default:
+                // No actions from the human during dealer turn or after round over
+                betChoiceBox.setDisable(true);
+                saveBetButton.setDisable(true);
+                hitButton.setDisable(true);
+                standButton.setDisable(true);
+                break;
+        }
+    }
+
 
     private VBox createDealerSection() {
         VBox section = new VBox(3);
@@ -376,13 +443,10 @@ public class BlackJackApp extends Application {
         dealerScoreLabel = new Label("Score: 0");
         dealerScoreLabel.setStyle("-fx-font-size: 24; -fx-text-fill: white; -fx-font-weight: bold;");
         
-        dealerBetLabel = new Label("Bet: $0");
-        dealerBetLabel.setStyle("-fx-font-size: 20; -fx-text-fill: #ffff00;");
-        
         dealerMoneyLabel = new Label();
         dealerMoneyLabel.setStyle("-fx-font-size: 24; -fx-text-fill: #ffff00;");
         
-        rightBox.getChildren().addAll(dealerHandBox, dealerScoreLabel, dealerBetLabel);
+        rightBox.getChildren().addAll(dealerHandBox, dealerScoreLabel);
         
         HBox mainBox = new HBox(10);
         mainBox.setAlignment(Pos.CENTER_LEFT);
@@ -428,7 +492,8 @@ public class BlackJackApp extends Application {
             if (compNum == 1) {
                 comp1HandBox = handBox;
                 comp1HandBox.setId("comp1HandBox");
-            } else {
+            } 
+            else {
                 comp2HandBox = handBox;
                 comp2HandBox.setId("comp2HandBox");
             }
@@ -667,7 +732,7 @@ public class BlackJackApp extends Application {
             hitButton.setDisable(true);
             standButton.setDisable(true);
             // Auto-play computer and dealer turns after delay
-            Timeline timeline = new Timeline(new KeyFrame(Duration.millis(1000), event -> {
+            Timeline timeline = new Timeline(new KeyFrame(Duration.millis(COMPUTER_TURN_DELAY_MS), event -> {
                 playComputerTurns();
             }));
             timeline.setCycleCount(1);
@@ -690,14 +755,25 @@ public class BlackJackApp extends Application {
 
     private void playNextComputerTurn(int playerIndex) {
         if (playerIndex < 3) {
+            Player p = game.getPlayers().get(playerIndex);
+
+            // Skip computers that are not in this round (no bet / effectively bankrupt)
+            if (!(p instanceof game.blackjack.players.Computer) || p.getBetAmount() == 0) {
+                // Just move on to the next player (or dealer if done)
+                playNextComputerTurn(playerIndex + 1);
+                return;
+            }
+
+            // Add delay before showing computer action
             Timeline timeline = new Timeline(new KeyFrame(Duration.millis(CARD_DELAY_MS), event -> {
-                game.processPlayerTurn(game.getPlayers().get(playerIndex));
+                game.processPlayerTurn(p);
                 updateUI();
                 playNextComputerTurn(playerIndex + 1);
             }));
             timeline.setCycleCount(1);
             timeline.play();
         } else {
+            // Dealer turn with delay
             Timeline timeline = new Timeline(new KeyFrame(Duration.millis(CARD_DELAY_MS), event -> {
                 game.dealerTurn();
                 updateUI();
@@ -722,7 +798,7 @@ public class BlackJackApp extends Application {
         }
 
         if (dealerHandBox != null) {
-            updatePlayerDisplay(dealerHandBox, dealerNameLabel, dealerScoreLabel, game.getDealer(), dealerMoneyLabel, dealerBetLabel, game.getGameState() == GameState.DEALER_TURN);
+            updatePlayerDisplay(dealerHandBox, dealerNameLabel, dealerScoreLabel, game.getDealer(), dealerMoneyLabel, null, game.getGameState() == GameState.DEALER_TURN);
         }
         if (comp1HandBox != null) {
             updatePlayerDisplay(comp1HandBox, comp1NameLabel, comp1ScoreLabel, game.getComputerPlayer1(), comp1MoneyLabel, comp1BetLabel, game.getCurrentPlayer() == game.getComputerPlayer1());
@@ -734,7 +810,29 @@ public class BlackJackApp extends Application {
             updatePlayerDisplay(humanHandBox, humanNameLabel, humanScoreLabel, game.getHumanPlayer(), humanMoneyLabel, humanBetLabel, game.getCurrentPlayer() == game.getHumanPlayer());
         }
 
-        if (game.getGameState() == GameState.ROUND_OVER && !game.isGameOver()) {
+        // Only check bankruptcy after round is over (when results are calculated and money adjusted)
+        if (game.getGameState() == GameState.ROUND_OVER) {
+            if (game.isGameOver()) {
+                int maxMoney = game.getMaxMoneyReached();
+                try {
+                    FileManager.updateAllBlackjackScores(username, maxMoney);
+                } catch (Exception e) {
+                    System.err.println("Error updating highscore: " + e.getMessage());
+                }
+                Timeline timeline = new Timeline(new KeyFrame(Duration.millis(2000), event -> {
+                    showAlert("You are bankrupt! Maximum balance reached: $" + maxMoney);
+                    switchToPreGameArea();
+                }));
+                timeline.setCycleCount(1);
+                timeline.play();
+                return;
+            }
+
+            try {
+                FileManager.updateAllBlackjackScores(username, game.getMaxMoneyReached());
+            } catch (Exception e) {
+                System.err.println("Error updating highscore: " + e.getMessage());
+            }
             Timeline timeline = new Timeline(new KeyFrame(Duration.millis(3000), event -> {
                 game.startNewRound();
                 betChoiceBox.setDisable(false);
@@ -761,7 +859,8 @@ public class BlackJackApp extends Application {
             Label hiddenLabel = new Label("[Hidden]");
             hiddenLabel.setStyle("-fx-font-size: 24; -fx-text-fill: #aaaaaa; -fx-alignment: center; -fx-padding: 3;");
             handDisplayBox.getChildren().add(hiddenLabel);
-        } else {
+        } 
+        else {
             cardsToShow.addAll(player.getHand());
         }
 
@@ -776,12 +875,14 @@ public class BlackJackApp extends Application {
                 game.getGameState() != GameState.ROUND_OVER && game.getGameState() != GameState.DEALER_TURN) {
                 scoreLabel.setText("Score: Hidden");
                 scoreLabel.setStyle("-fx-font-size: 24; -fx-text-fill: #ffffaa; -fx-font-weight: bold;");
-            } else {
+            } 
+            else {
                 String text = "Score: " + player.getCurrScore();
                 if (player.hasBusted()) {
                     text += " (BUST)";
                     scoreLabel.setStyle("-fx-font-size: 24; -fx-text-fill: #ff6666; -fx-font-weight: bold;");
-                } else {
+                } 
+                else {
                     scoreLabel.setStyle("-fx-font-size: 24; -fx-text-fill: white; -fx-font-weight: bold;");
                 }
                 scoreLabel.setText(text);
@@ -790,7 +891,8 @@ public class BlackJackApp extends Application {
 
         if (isCurrentPlayer && game.getGameState() != GameState.ROUND_OVER) {
             nameLabel.setStyle("-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #ffff00; -fx-background-color: #0066cc; -fx-padding: 5;");
-        } else {
+        } 
+        else {
             nameLabel.setStyle("-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: white;");
         }
 
@@ -901,16 +1003,13 @@ public class BlackJackApp extends Application {
     }
 
     private boolean isSaveAvailableForUser(String username) throws Exception {
-        Path p = Paths.get("txtfiles/BlackJackSave.txt");
-        
-        if (!Files.exists(p)) {
-            return false;
+        Path p = Paths.get("txtfiles", "blackjack.txt");
+        if (!Files.exists(p) || Files.size(p) == 0) return false;
+        List<String> lines = Files.readAllLines(p, java.nio.charset.StandardCharsets.UTF_8);
+        for (String line : lines) {
+            if (line.startsWith(username + ":")) return true;
         }
-            
-        String s = new String(Files.readAllBytes(p));
-        ObjectMapper mapper = new ObjectMapper();
-        SaveState state = mapper.readValue(s, SaveState.class);
-        return state != null && state.humanUsername != null && state.humanUsername.equals(username);
+        return false;
     }
 
     public void saveGame() {
@@ -919,12 +1018,50 @@ public class BlackJackApp extends Application {
                 showAlert("No game to save.");
                 return;
             }
-            game.saveToFile();
-            showAlert("Game saved successfully to BlackJackSave.txt");
+            String pwd = promptForPassword("Enter account password to encrypt save:");
+            if (pwd == null) {
+                showAlert("Save cancelled.");
+                return;
+            }
+            String saveJson = game.generateSaveStateString();
+            FileManager.saveBlackjackSave(username, saveJson, pwd);
+            showAlert("Game saved successfully.");
         } 
         catch (Exception e) {
             showAlert("Error saving game: " + e.getMessage());
         }
+    }
+
+    private String promptForPassword(String message) {
+        final String[] result = new String[1];
+        Stage dialog = new Stage();
+        dialog.initModality(Modality.APPLICATION_MODAL);
+        dialog.setTitle("Password Required");
+
+        Label lbl = new Label(message);
+        PasswordField pf = new PasswordField();
+        pf.setPromptText("Password");
+        Button ok = new Button("OK");
+        Button cancel = new Button("Cancel");
+        ok.setOnAction(e -> {
+            result[0] = pf.getText();
+            dialog.close();
+        });
+        cancel.setOnAction(e -> {
+            result[0] = null;
+            dialog.close();
+        });
+
+        HBox buttons = new HBox(10, ok, cancel);
+        buttons.setAlignment(Pos.CENTER);
+        VBox box = new VBox(10, lbl, pf, buttons);
+        box.setPadding(new Insets(10));
+        box.setAlignment(Pos.CENTER);
+
+        Scene s = new Scene(box, 360, 140);
+        dialog.setScene(s);
+        dialog.showAndWait();
+        return result[0];
     }
 
     private void showAlert(String message) {

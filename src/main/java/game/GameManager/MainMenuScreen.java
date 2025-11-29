@@ -187,7 +187,7 @@ public class MainMenuScreen extends BackgroundSetUp {
         //create ObservableList of rows (add current user's top 5 highest scores for each game into the ScoreRow object)
         ObservableList<ScoreRow> scoresData = FXCollections.observableArrayList();
         for(int i = 0; i < 5; i++){
-            scoresData.add(new ScoreRow(snakeGameScores[i] + 1000, blackjackScores[i] + 1000)); //TODO: Look here: this is where I add 1000 to make the default starting score, 1000
+            scoresData.add(new ScoreRow(snakeGameScores[i], blackjackScores[i])); //TODO: Look here: this is where I add 1000 to make the default starting score, 1000
         }
 
         highScoreTable.setItems(scoresData); //give scoresData to the table
