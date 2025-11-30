@@ -26,11 +26,6 @@ public class Computer extends Player implements Gambler{
     }
 
     @Override
-    public void stand() {
-        hasStood = true;
-    }
-
-    @Override
     public void placeBet(int amount) {
         int chosen = personality.chooseBet(rnd);
         if (chosen > money) {

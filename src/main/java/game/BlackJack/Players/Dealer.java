@@ -23,11 +23,6 @@ public class Dealer extends Player {
         }
     }
 
-    @Override
-    public void stand() {
-        hasStood = true;
-    }
-
     public void dealerTurn() {
         while (currScore < DEALER_HIT_THRESHOLD && !hasBusted) {
             hit();

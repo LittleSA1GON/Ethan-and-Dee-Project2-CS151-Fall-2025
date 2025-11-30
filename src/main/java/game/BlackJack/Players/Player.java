@@ -27,7 +27,9 @@ public abstract class Player {
 
     public abstract void hit();
 
-    public abstract void stand();
+    public void stand() {
+        hasStood = true;
+    }
     
     public void updateScore() {
         if (pizzaBlackJack()) {
