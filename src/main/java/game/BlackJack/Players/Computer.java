@@ -11,7 +11,6 @@ public class Computer extends Player implements Gambler{
     public Computer(String username, CompPersonalities personality, BlackJackGame game) {
         this.username = username;
         this.game = game;
-        this.money = 1000;
         this.personality = personality;
     }
 

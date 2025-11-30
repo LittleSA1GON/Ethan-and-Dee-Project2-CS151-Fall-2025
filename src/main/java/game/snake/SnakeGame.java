@@ -365,7 +365,7 @@ public class SnakeGame extends BackgroundSetUp {
     }//end of updateSnakeArrayList
 
     public void updateStateSinceFoodIsEaten(){
-        this.score += 100;  // 100 points per fruit
+        this.score += 200;  // 200 points per fruit
         currScoreLabel.setText(String.valueOf(this.score));
         createFood();
     }

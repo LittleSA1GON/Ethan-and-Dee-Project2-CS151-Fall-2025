@@ -8,7 +8,6 @@ public class Human extends Player implements Gambler {
     public Human(String username, BlackJackGame game) {
         this.username = username;
         this.game = game;
-        this.money = 1000;
     }
 
     @Override

@@ -816,7 +816,8 @@ public class BlackJackApp extends Application {
                 int maxMoney = game.getMaxMoneyReached();
                 try {
                     FileManager.updateAllBlackjackScores(username, maxMoney);
-                } catch (Exception e) {
+                } 
+                catch (Exception e) {
                     System.err.println("Error updating highscore: " + e.getMessage());
                 }
                 Timeline timeline = new Timeline(new KeyFrame(Duration.millis(2000), event -> {
@@ -826,12 +827,6 @@ public class BlackJackApp extends Application {
                 timeline.setCycleCount(1);
                 timeline.play();
                 return;
-            }
-
-            try {
-                FileManager.updateAllBlackjackScores(username, game.getMaxMoneyReached());
-            } catch (Exception e) {
-                System.err.println("Error updating highscore: " + e.getMessage());
             }
             Timeline timeline = new Timeline(new KeyFrame(Duration.millis(3000), event -> {
                 game.startNewRound();
@@ -1029,6 +1024,11 @@ public class BlackJackApp extends Application {
         } 
         catch (Exception e) {
             showAlert("Error saving game: " + e.getMessage());
+        }
+        try {
+            FileManager.updateAllBlackjackScores(username, game.getMaxMoneyReached());
+        } catch (Exception e) {
+            System.err.println("Error updating highscore: " + e.getMessage());
         }
     }
 
