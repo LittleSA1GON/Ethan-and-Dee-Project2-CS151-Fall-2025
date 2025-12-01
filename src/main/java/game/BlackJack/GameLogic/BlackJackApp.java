@@ -47,8 +47,9 @@ public class BlackJackApp extends Application {
     private String username;
     private ToolBar toolbarc;
     private Scene gameScene;
-    private static final int CARD_DELAY_MS = 60;
-    private static final int COMPUTER_TURN_DELAY_MS = 2000;  // 2 second delay between computer decisions 
+    private static final int CARD_DELAY_MS = 120;
+    private static final int COMPUTER_TURN_DELAY_MS = 1000;
+    private static final int DEALER_TURN_DELAY_MS = 1000;    
 
     private BorderPane contentPane;
     private Pane gameArea;
@@ -85,7 +86,6 @@ public class BlackJackApp extends Application {
     private Label comp2ScoreLabel;
     private Label humanScoreLabel;
 
-    // Under-hub bar controls
     private Label gameStateLabel;
     private Label blackjackTitleLabel;
     private Button newGameBtn;
@@ -116,21 +116,6 @@ public class BlackJackApp extends Application {
 
         primaryStage.setTitle("BlackJack");
     }
-
-    @Override
-    public void start(Stage primaryStage) {
-        primaryStage.setTitle("BlackJack");
-        primaryStage.setWidth(1200);
-        primaryStage.setHeight(800);
-
-        ToolBar hubBar = toolbarc;
-        BorderPane root = createGameSceneWithCustomToolbar(hubBar);
-
-        gameScene = new Scene(root);
-        primaryStage.setScene(gameScene);
-        primaryStage.show();
-    }
-
 
     public BorderPane createGameSceneWithCustomToolbar(ToolBar customToolbar) {
         Pane backgroundPane = new Pane();
@@ -363,13 +348,11 @@ public class BlackJackApp extends Application {
             return;
         }
 
-        // These may be null early in setup; be defensive.
         if (betChoiceBox == null || saveBetButton == null ||
             hitButton == null || standButton == null) {
             return;
         }
 
-        // Default: disable all action buttons
         hitButton.setDisable(true);
         standButton.setDisable(true);
 
@@ -377,17 +360,14 @@ public class BlackJackApp extends Application {
 
         switch (state) {
             case NEW_ROUND:
-                // Player needs to place bets
                 betChoiceBox.setDisable(false);
                 saveBetButton.setDisable(false);
                 break;
 
             case PLAYER_TURN:
-                // Bets already placed, so disable betting controls
                 betChoiceBox.setDisable(true);
                 saveBetButton.setDisable(true);
 
-                // Enable Hit/Stand only if it's the human's turn and they’re still live
                 if (game.getCurrentPlayer() == game.getHumanPlayer()
                         && !game.getHumanPlayer().hasBusted()
                         && !game.getHumanPlayer().hasStood()) {
@@ -399,7 +379,6 @@ public class BlackJackApp extends Application {
             case DEALER_TURN:
             case ROUND_OVER:
             default:
-                // No actions from the human during dealer turn or after round over
                 betChoiceBox.setDisable(true);
                 saveBetButton.setDisable(true);
                 hitButton.setDisable(true);
@@ -731,7 +710,6 @@ public class BlackJackApp extends Application {
         if (game.getHumanPlayer().hasBusted()) {
             hitButton.setDisable(true);
             standButton.setDisable(true);
-            // Auto-play computer and dealer turns after delay
             Timeline timeline = new Timeline(new KeyFrame(Duration.millis(COMPUTER_TURN_DELAY_MS), event -> {
                 playComputerTurns();
             }));
@@ -756,15 +734,11 @@ public class BlackJackApp extends Application {
     private void playNextComputerTurn(int playerIndex) {
         if (playerIndex < 3) {
             Player p = game.getPlayers().get(playerIndex);
-
-            // Skip computers that are not in this round (no bet / effectively bankrupt)
-            if (!(p instanceof game.blackjack.players.Computer) || p.getBetAmount() == 0) {
-                // Just move on to the next player (or dealer if done)
+            if (!(p instanceof Computer) || p.getBetAmount() == 0) {
                 playNextComputerTurn(playerIndex + 1);
                 return;
             }
 
-            // Add delay before showing computer action
             Timeline timeline = new Timeline(new KeyFrame(Duration.millis(CARD_DELAY_MS), event -> {
                 game.processPlayerTurn(p);
                 updateUI();
@@ -773,8 +747,7 @@ public class BlackJackApp extends Application {
             timeline.setCycleCount(1);
             timeline.play();
         } else {
-            // Dealer turn with delay
-            Timeline timeline = new Timeline(new KeyFrame(Duration.millis(CARD_DELAY_MS), event -> {
+            Timeline timeline = new Timeline(new KeyFrame(Duration.millis(DEALER_TURN_DELAY_MS), event -> {
                 game.dealerTurn();
                 updateUI();
             }));
@@ -810,8 +783,9 @@ public class BlackJackApp extends Application {
             updatePlayerDisplay(humanHandBox, humanNameLabel, humanScoreLabel, game.getHumanPlayer(), humanMoneyLabel, humanBetLabel, game.getCurrentPlayer() == game.getHumanPlayer());
         }
 
-        // Only check bankruptcy after round is over (when results are calculated and money adjusted)
         if (game.getGameState() == GameState.ROUND_OVER) {
+            final BlackJackGame roundGame = this.game;
+
             if (game.isGameOver()) {
                 int maxMoney = game.getMaxMoneyReached();
                 try {
@@ -821,6 +795,11 @@ public class BlackJackApp extends Application {
                     System.err.println("Error updating highscore: " + e.getMessage());
                 }
                 Timeline timeline = new Timeline(new KeyFrame(Duration.millis(2000), event -> {
+                    if (this.game != roundGame) {
+                        return;
+                    }
+                    if (this.game == null || this.game.getGameState() != GameState.ROUND_OVER) {
+                    }
                     showAlert("You are bankrupt! Maximum balance reached: $" + maxMoney);
                     switchToPreGameArea();
                 }));
@@ -828,12 +807,20 @@ public class BlackJackApp extends Application {
                 timeline.play();
                 return;
             }
+
             Timeline timeline = new Timeline(new KeyFrame(Duration.millis(3000), event -> {
-                game.startNewRound();
+                if (this.game != roundGame) {
+                    return;
+                }
+                if (this.game == null || this.game.getGameState() != GameState.ROUND_OVER) {
+                    return;
+                }
+                this.game.startNewRound();
                 betChoiceBox.setDisable(false);
                 saveBetButton.setDisable(false);
                 hitButton.setDisable(true);
                 standButton.setDisable(true);
+
                 updateUI();
             }));
             timeline.setCycleCount(1);
@@ -956,8 +943,6 @@ public class BlackJackApp extends Application {
                 rankStr = card.getRank().toString(); 
                 break;
         }
-        
-        // Convert suit to symbol
         switch (card.getSuit().toString()) {
             case "HEARTS": 
                 suitStr = "♥"; 
@@ -982,7 +967,7 @@ public class BlackJackApp extends Application {
         return rankStr + " " + suitStr;
     }
 
-    private Image getCompPersonalityImage(game.blackjack.players.Player p) {
+    private Image getCompPersonalityImage(Player p) {
         try {
             if (p instanceof Computer) {
                 Computer c = (Computer) p;
@@ -992,7 +977,7 @@ public class BlackJackApp extends Application {
             }
         } 
         catch (Exception e) {
-            // fallthrough
+
         }
         return new Image(getClass().getResourceAsStream("/game/blackjack/image1.png"));
     }
@@ -1094,6 +1079,18 @@ public class BlackJackApp extends Application {
 
     public BlackJackGame getGame() {
         return game;
+    }
+
+    @Override
+    public void start(Stage primaryStage) {
+        primaryStage.setTitle("BlackJack");
+        primaryStage.setWidth(1200);
+        primaryStage.setHeight(800);
+        ToolBar hubBar = toolbarc;
+        BorderPane root = createGameSceneWithCustomToolbar(hubBar);
+        gameScene = new Scene(root);
+        primaryStage.setScene(gameScene);
+        primaryStage.show();
     }
 
     public static void main(String[] args) {

@@ -46,7 +46,9 @@ public class FileManager {
 
         boolean replaced = false;
         for (int i = 0; i < lines.size(); i++) {
+
             String line = lines.get(i).trim();
+
             if (line.startsWith(username + ":")) {
                 lines.set(i, username + ":" + hash);
                 replaced = true;
@@ -62,9 +64,14 @@ public class FileManager {
 
     public static boolean verifyUserAccount(String username, String password) throws IOException, NoSuchAlgorithmException {
         init();
-        if (!Files.exists(USERS_FILE)) return false;
+        
+        if (!Files.exists(USERS_FILE)){
+            return false;
+        }
+
         List<String> lines = Files.readAllLines(USERS_FILE, StandardCharsets.UTF_8);
         String targetHash = bytesToHex(sha256(password.getBytes(StandardCharsets.UTF_8)));
+
         for (String line : lines) {
             String[] parts = line.split(":", 2);
             if (parts.length == 2 && parts[0].equals(username)) {

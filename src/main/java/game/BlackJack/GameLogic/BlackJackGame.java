@@ -44,6 +44,9 @@ public class BlackJackGame {
         CompPersonalities[] vals = CompPersonalities.values();
         CompPersonalities p1 = vals[rnd.nextInt(vals.length)];
         CompPersonalities p2 = vals[rnd.nextInt(vals.length)];
+        while (p2 == p1) {
+            p2 = vals[rnd.nextInt(vals.length)];
+        }
         this.computerPlayer1 = new Computer("Computer 1", p1, this);
         this.computerPlayer2 = new Computer("Computer 2", p2, this);
         this.dealer = new Dealer(this);
@@ -54,31 +57,6 @@ public class BlackJackGame {
         initializeDeck();
     }
 
-    public BlackJackGame(String username, boolean isLoading) throws Exception {
-        this.shuffledDeck = new Stack<>();
-        this.unshuffledDeck = new ArrayList<>();
-        this.players = new ArrayList<>();
-        if (isLoading) {
-            String saveStateString = loadFromFile();
-            loadFromSaveState(saveStateString);
-        } 
-        else {
-            Random rnd = new Random();
-            CompPersonalities[] vals = CompPersonalities.values();
-            CompPersonalities p1 = vals[rnd.nextInt(vals.length)];
-            CompPersonalities p2 = vals[rnd.nextInt(vals.length)];
-            this.humanPlayer = new Human(username, this);
-            this.computerPlayer1 = new Computer("Computer 1", p1, this);
-            this.computerPlayer2 = new Computer("Computer 2", p2, this);
-            this.dealer = new Dealer(this);
-            initializePlayers();
-        }
-        initializeDeck();
-    }
-
-    /**
-     * Construct and load from per-user encrypted save using provided password.
-     */
     public BlackJackGame(String username, boolean isLoading, String password) throws Exception {
         this.shuffledDeck = new Stack<>();
         this.unshuffledDeck = new ArrayList<>();
@@ -217,28 +195,31 @@ public class BlackJackGame {
             comp.makeDecision();
             if (comp.hasBusted()) {
                 lastStatusMessage = comp.getUsername() + " busts!";
-            } 
+            }
             else if (comp.hasStood()) {
                 lastStatusMessage = comp.getUsername() + " stands with " + comp.getCurrScore();
-            } 
+            }
             else {
                 lastStatusMessage = comp.getUsername() + " hits!";
             }
-            moveToNextPlayer();
-        } 
+        }
         else if (player instanceof Dealer) {
             Dealer d = (Dealer) player;
             d.dealerTurn();
             if (d.hasBusted()) {
                 lastStatusMessage = "Dealer busts!";
-            } 
+            }
             else if (d.hasStood()) {
                 lastStatusMessage = "Dealer stands with " + d.getCurrScore();
-            } 
+            }
             else {
                 lastStatusMessage = "Dealer hits!";
             }
         }
+    }
+
+    public void advanceToNextPlayer() {
+        moveToNextPlayer();
     }
 
     public void humanPlayerHit() {
@@ -268,12 +249,10 @@ public class BlackJackGame {
         currentPlayerIndex++;
         if (currentPlayerIndex < players.size() - 1) {
             Player nextPlayer = players.get(currentPlayerIndex);
-            // Skip players who are bankrupt or have no bet
             while (currentPlayerIndex < players.size() - 1 && (nextPlayer.getMoney() <= 0 || nextPlayer.getBetAmount() == 0)) {
                 currentPlayerIndex++;
                 nextPlayer = players.get(currentPlayerIndex);
             }
-            // If we've reached the dealer or beyond, start dealer turn
             if (currentPlayerIndex >= players.size() - 1) {
                 dealerTurn();
             }
@@ -444,7 +423,6 @@ public class BlackJackGame {
         dealer.setHasStood(state.dealerHasStood);
         dealer.setHasBusted(state.dealerHasBusted);
 
-        // Populate players list without resetting gameState (preserve loaded state)
         players.clear();
         players.add(humanPlayer);
         players.add(computerPlayer1);
@@ -481,7 +459,6 @@ public class BlackJackGame {
         return cards;
     }
 
-    // Getters
     public Human getHumanPlayer() { return humanPlayer; }
     public Computer getComputerPlayer1() { return computerPlayer1; }
     public Computer getComputerPlayer2() { return computerPlayer2; }
