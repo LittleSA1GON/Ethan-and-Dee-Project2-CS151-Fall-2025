@@ -371,13 +371,11 @@ public class SnakeGame extends BackgroundSetUp {
     }
 
     public void gameOver(){
-        if(needToUpdateSnakeGameScoresArray(this.score)){  //Instantly write to the file here so that even when user close the program after the game is over, the file will always get updated 
-            try {
-                FileManager.updateAllSnakeScores(username, snakeGameScores);
-            } catch (IOException e) {
-                System.err.println("Error updating snake scores: " + e.getMessage());
-                e.printStackTrace();
-            }
+        try {
+           FileManager.updateGlobalScore(username, this.score, "snake");
+        } catch (IOException e) {
+            System.err.println("Error updating snake scores: " + e.getMessage());
+            e.printStackTrace();
         }
         this.animationTimer.stop();
         this.isGameOver = true;

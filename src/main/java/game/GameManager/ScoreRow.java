@@ -1,17 +1,31 @@
 package game.gamemanager;
 
 public class ScoreRow {
-    private int snakeGameScore;
-    private int blackjackScore;
 
-    public ScoreRow(int snakeGameScore, int blackjackScore){
-        this.snakeGameScore = snakeGameScore;
+    private final String snakeUser;
+    private final int snakeScore;
+    private final String blackjackUser;
+    private final int blackjackScore;
+
+    public ScoreRow(String snakeUser, int snakeScore, String blackjackUser, int blackjackScore) {
+        this.snakeUser = snakeUser;
+        this.snakeScore = snakeScore;
+        this.blackjackUser = blackjackUser;
         this.blackjackScore = blackjackScore;
     }
-    public Integer getSnakeGameScore(){ //javafx TableView's requires a getter that returns Integer (a reference type)
-        return this.snakeGameScore; //autoboxing int -> Integer
+
+    public String getSnakeUser() {
+        return snakeUser;
     }
-    public Integer getBlackjackScore(){
-        return this.blackjackScore;
+    public int getSnakeScore() {
+        return snakeScore;
+    }
+
+    public String getBlackjackUser() {
+        return blackjackUser;
+    }
+
+    public int getBlackjackScore() {
+        return blackjackScore;
     }
 }

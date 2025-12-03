@@ -789,7 +789,7 @@ public class BlackJackApp extends Application {
             if (game.isGameOver()) {
                 int maxMoney = game.getMaxMoneyReached();
                 try {
-                    FileManager.updateAllBlackjackScores(username, maxMoney);
+                    FileManager.updateGlobalScore(username, maxMoney, "blackjack");
                 } 
                 catch (Exception e) {
                     System.err.println("Error updating highscore: " + e.getMessage());
@@ -1011,8 +1011,9 @@ public class BlackJackApp extends Application {
             showAlert("Error saving game: " + e.getMessage());
         }
         try {
-            FileManager.updateAllBlackjackScores(username, game.getMaxMoneyReached());
-        } catch (Exception e) {
+            FileManager.updateGlobalScore(username, game.getMaxMoneyReached(), "blackjack");
+        } 
+        catch (Exception e) {
             System.err.println("Error updating highscore: " + e.getMessage());
         }
     }

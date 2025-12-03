@@ -32,7 +32,6 @@ public class GameManager extends Application{
     @Override
     public void start(Stage stage){
         this.primaryStage = stage;
-
         FirstScreen firstScreen = new FirstScreen();
         StackPane firstScreenRootNode = firstScreen.getRootNode();
         
@@ -40,7 +39,6 @@ public class GameManager extends Application{
         primaryStage.setTitle("Welcome Page");
         primaryStage.setScene(currScene);
         
-        // Start GameManager music on application startup
         MusicManager.playGameManagerMusic();
 
         attachListenersToFirstScreenButtons(firstScreen.getLoginButton(), firstScreen.getCreateAccountButton());
@@ -162,7 +160,6 @@ public class GameManager extends Application{
             if (result.isPresent() && result.get() == ButtonType.OK) {
                 try {
                     FileManager.deleteUserAccount(username);
-                    FileManager.deleteUserHighScores(username);
                     FileManager.deleteAllBlackjackSaves(username);
                 } 
                 catch (IOException e) {
@@ -263,7 +260,6 @@ public class GameManager extends Application{
 
     public void createAndGoToFirstScreenScene(){
         this.primaryStage.setTitle("Welcome Page");
-        // Only start music if it's not already playing
         if (!MusicManager.isGameManagerMusicPlaying()) {
             MusicManager.playGameManagerMusic();
         }

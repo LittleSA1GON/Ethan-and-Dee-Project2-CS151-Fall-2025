@@ -1,12 +1,12 @@
 package game.gamemanager;
 
+import java.util.List;
+import java.util.ArrayList;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.Files;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.StandardOpenOption;
-import java.util.List;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.io.IOException;
 import java.security.MessageDigest;
@@ -39,6 +39,28 @@ public class FileManager {
         }
     }
 
+    public static void initGlobalScoreboard() throws IOException {
+        init();
+
+        if (!Files.exists(HIGHSCORES_FILE) || Files.size(HIGHSCORES_FILE) == 0) {
+            List<String> defaultLines = new ArrayList<>();
+
+            StringBuilder blackjackLine = new StringBuilder("blackjack");
+            StringBuilder snakeLine = new StringBuilder("snake");
+
+            for (int i = 1; i <= 5; i++) {
+                blackjackLine.append(":").append("User").append(i).append("+1000");
+                snakeLine.append(":").append("User").append(i).append("+1000");
+            }
+
+            defaultLines.add(blackjackLine.toString());
+            defaultLines.add(snakeLine.toString());
+
+            Files.write(HIGHSCORES_FILE, defaultLines, StandardCharsets.UTF_8);
+        }
+    }
+
+    
     public static boolean saveUserAccount(String username, String password) throws IOException, NoSuchAlgorithmException {
         init();
         String hash = bytesToHex(sha256(password.getBytes(StandardCharsets.UTF_8)));
@@ -64,11 +86,9 @@ public class FileManager {
 
     public static boolean verifyUserAccount(String username, String password) throws IOException, NoSuchAlgorithmException {
         init();
-        
         if (!Files.exists(USERS_FILE)){
             return false;
         }
-
         List<String> lines = Files.readAllLines(USERS_FILE, StandardCharsets.UTF_8);
         String targetHash = bytesToHex(sha256(password.getBytes(StandardCharsets.UTF_8)));
 
@@ -94,14 +114,9 @@ public class FileManager {
     }
 
     public static void initUserHighScores(String username) throws IOException {
-        init();
-        StringBuilder sb = new StringBuilder();
-        sb.append(username);
-        for (int i = 0; i < 10; i++) {
-            sb.append(":1000");
-        }
-        sb.append(System.lineSeparator());
-        Files.write(HIGHSCORES_FILE, sb.toString().getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
+        initGlobalScoreboard();
+        updateGlobalScore(username, 1000, "snake");
+        updateGlobalScore(username, 1000, "blackjack");
     }
 
     public static void saveBlackjackSave(String username, String plainJson, String password) throws Exception {
@@ -151,139 +166,6 @@ public class FileManager {
         return null;
     }
 
-    public static void updateAllBlackjackScores(String username, int newScore) throws IOException {
-        init();
-        List<String> lines = Files.readAllLines(HIGHSCORES_FILE, StandardCharsets.UTF_8);
-
-        for (int i = 0; i < lines.size(); i++) {
-            String line  = lines.get(i);
-            String[] parts = line.split(":", -1);
-
-            if (parts.length > 0 && parts[0].equals(username)) {
-
-                while (parts.length < 11) {
-                    line += ":1000";
-                    parts = line.split(":", -1);
-                }
-
-                int lowestScore = Integer.parseInt(parts[10]);
-
-                if (newScore > lowestScore) {
-                    parts[10] = parts[9];
-                    parts[9]  = parts[8];
-                    parts[8]  = parts[7];
-                    parts[7]  = parts[6];
-                    parts[6]  = String.valueOf(newScore);
-
-                    line = String.join(":", parts);
-                    lines.set(i, line);
-                    Files.write(HIGHSCORES_FILE, lines, StandardCharsets.UTF_8);
-                }
-                return;
-            }
-        }
-
-
-        StringBuilder sb = new StringBuilder(username);
-        for (int i = 0; i < 5; i++) sb.append(":1000");    
-        sb.append(":").append(newScore);                 
-        for (int i = 0; i < 4; i++) sb.append(":1000");      
-        sb.append(System.lineSeparator());
-        Files.write(HIGHSCORES_FILE, sb.toString().getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
-    }
-
-    public static void updateBlackjackScore(String username, int scoreIndex, int score)
-            throws IOException {
-        init();
-        if (scoreIndex < 0 || scoreIndex > 4) {
-            throw new IllegalArgumentException("scoreIndex must be 0–4");
-        }
-
-        List<String> lines = Files.readAllLines(HIGHSCORES_FILE, StandardCharsets.UTF_8);
-        for (int i = 0; i < lines.size(); i++) {
-            String line  = lines.get(i);
-            String[] parts = line.split(":", -1);
-
-            if (parts.length > 0 && parts[0].equals(username)) {
-                while (parts.length < 11) {
-                    line += ":1000";
-                    parts = line.split(":", -1);
-                }
-
-                parts[6 + scoreIndex] = String.valueOf(score);
-                line = String.join(":", parts);
-                lines.set(i, line);
-                Files.write(HIGHSCORES_FILE, lines, StandardCharsets.UTF_8);
-                return;
-            }
-        }
-
-        StringBuilder sb = new StringBuilder(username);
-        for (int i = 0; i < 5; i++) {
-            sb.append(":1000"); 
-        }
-        for (int i = 0; i < 5; i++) {
-            if (i == scoreIndex) {
-                sb.append(":").append(score);
-            } else {
-                sb.append(":1000");
-            }
-        }
-        sb.append(System.lineSeparator());
-        Files.write(HIGHSCORES_FILE, sb.toString().getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
-    }
-    public static void updateAllSnakeScores(String username, int[] snakeScores) throws IOException {
-        if (snakeScores == null || snakeScores.length != 5) {
-            throw new IllegalArgumentException("snakeScores must be an array of 5 integers");
-        }
-
-        init();
-        List<String> lines = Files.readAllLines(HIGHSCORES_FILE, StandardCharsets.UTF_8);
-
-        for (int i = 0; i < lines.size(); i++) {
-            String line  = lines.get(i);
-            String[] parts = line.split(":", -1);
-
-            if (parts.length > 0 && parts[0].equals(username)) {
-
-                while (parts.length < 11) {
-                    line += ":1000";
-                    parts = line.split(":", -1);
-                }
-
-                int lowestExistingScore = Integer.parseInt(parts[5]);
-
-                boolean shouldUpdate = false;
-                for (int score : snakeScores) {
-                    if (score > lowestExistingScore) {
-                        shouldUpdate = true;
-                        break;
-                    }
-                }
-
-                if (shouldUpdate) {
-                    for (int j = 0; j < 5; j++) {
-                        parts[j + 1] = String.valueOf(snakeScores[j]);
-                    }
-                    line = String.join(":", parts);
-                    lines.set(i, line);
-                    Files.write(HIGHSCORES_FILE, lines, StandardCharsets.UTF_8);
-                }
-                return;
-            }
-        }
-
-        StringBuilder sb = new StringBuilder(username);
-        for (int j = 0; j < 5; j++) {
-            sb.append(":").append(snakeScores[j]);
-        }
-        for (int j = 0; j < 5; j++) {
-            sb.append(":1000"); 
-        }
-        sb.append(System.lineSeparator());
-        Files.write(HIGHSCORES_FILE, sb.toString().getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
-    }
-
     private static byte[] sha256(byte[] data) throws NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         return digest.digest(data);
@@ -305,13 +187,6 @@ public class FileManager {
         Files.write(USERS_FILE, lines, StandardCharsets.UTF_8);
     }
 
-    public static void deleteUserHighScores(String username) throws IOException {
-        init();
-        List<String> lines = Files.readAllLines(HIGHSCORES_FILE, StandardCharsets.UTF_8);
-        lines.removeIf(line -> line.startsWith(username + ":"));
-        Files.write(HIGHSCORES_FILE, lines, StandardCharsets.UTF_8);
-    }
-
     public static void deleteAllBlackjackSaves(String username) throws IOException {
         init();
         if (!Files.exists(BLACKJACK_FILE)) {
@@ -320,5 +195,99 @@ public class FileManager {
         List<String> lines = Files.readAllLines(BLACKJACK_FILE, StandardCharsets.UTF_8);
         lines.removeIf(line -> line.startsWith(username + ":"));
         Files.write(BLACKJACK_FILE, lines, StandardCharsets.UTF_8);
+    }
+    public static void updateGlobalScore(String username, int newScore, String game) throws IOException {
+        init();
+        initGlobalScoreboard();
+
+        List<String> lines = Files.readAllLines(HIGHSCORES_FILE, StandardCharsets.UTF_8);
+
+        int blackjackIndex = -1;
+        int snakeIndex = -1;
+
+        for (int i = 0; i < lines.size(); i++) {
+            String line = lines.get(i).trim();
+            if (line.toLowerCase().startsWith("blackjack:")) {
+                blackjackIndex = i;
+            } 
+            else if (line.toLowerCase().startsWith("snake:")) {
+                snakeIndex = i;
+            }
+        }
+
+        if (blackjackIndex == -1 || snakeIndex == -1) {
+            initGlobalScoreboard();
+            lines = Files.readAllLines(HIGHSCORES_FILE, StandardCharsets.UTF_8);
+            blackjackIndex = 0;
+            snakeIndex = 1;
+        }
+
+        int targetIndex = "blackjack".equalsIgnoreCase(game) ? blackjackIndex : snakeIndex;
+        String targetLine = lines.get(targetIndex).trim();
+
+        String[] parts = targetLine.split(":");
+        String gameName = parts[0];
+
+        List<UserScore> entries = new ArrayList<>();
+
+        for (int i = 1; i < parts.length; i++) {
+            String entry = parts[i].trim();
+            if (entry.isEmpty()) continue;
+
+            String[] userScoreParts = entry.split("\\+"); // username+score
+            if (userScoreParts.length != 2) continue;
+
+            String name = userScoreParts[0];
+            int score;
+            try {
+                score = Integer.parseInt(userScoreParts[1]);
+            } 
+            catch (NumberFormatException e) {
+                continue;
+            }
+
+            entries.add(new UserScore(name, score));
+        }
+
+        boolean found = false;
+
+        for (UserScore us : entries) {
+            if (us.getUsername().equals(username)) {
+                if (newScore > us.getScore()) {
+                    us.setScore(newScore);
+                }
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            if (entries.size() < 5) {
+                entries.add(new UserScore(username, newScore));
+            } 
+            else {
+                int lowestIndex = 0;
+                for (int i = 1; i < entries.size(); i++) {
+                    if (entries.get(i).getScore() < entries.get(lowestIndex).getScore()) {
+                        lowestIndex = i;
+                    }
+                }
+                if (newScore > entries.get(lowestIndex).getScore()) {
+                    entries.set(lowestIndex, new UserScore(username, newScore));
+                }
+            }
+        }
+
+        entries.sort((a, b) -> Integer.compare(b.getScore(), a.getScore()));
+
+        StringBuilder sb = new StringBuilder(gameName);
+        int limit = Math.min(5, entries.size());
+        for (int i = 0; i < limit; i++) {
+            UserScore us = entries.get(i);
+            sb.append(":").append(us.getUsername()).append("+").append(us.getScore());
+        }
+
+        lines.set(targetIndex, sb.toString());
+        Files.write(HIGHSCORES_FILE, lines, StandardCharsets.UTF_8);
     }
 }
