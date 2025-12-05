@@ -67,9 +67,6 @@ public class GameManager extends Application{
         }
         attachListenersToLoginScreenButton(loginScreen);
         attachBackButtonListenerToLoginScreen(loginScreen);
-        /* TODO: if have time, add 1 more boolean and if not the first time logging in after registering, turn the label off, not here */
-        //loginScreen.getSuccessfulLabel().setVisible(false);
-        //loginScreen.getSuccessfulLabel().setManaged(false);
     }
 
     public void createAndGoToCreateAccountScreenScene(){
