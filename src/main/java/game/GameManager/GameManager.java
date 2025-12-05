@@ -90,11 +90,10 @@ public class GameManager extends Application{
         BorderPane menuScreenRootNode = menuScreen.getRootNode();
         currScene.setRoot(menuScreenRootNode);
 
-        //TODO: attach listener to "Play Blackjack" Button
         attachListenersToMainMenuScreenButtons(menuScreen, username, menuScreen.getSnakeGameScores(), menuScreen.getBlackjackScores());
     }
 
-    public void attachListenersToMainMenuScreenButtons(MainMenuScreen menuScreen, String username, int[] snakeGameScores, int[] blackjackScores){ //TODO: Look, Top 5 highest Blackjack scores for curent user ready to use
+    public void attachListenersToMainMenuScreenButtons(MainMenuScreen menuScreen, String username, int[] snakeGameScores, int[] blackjackScores){
         menuScreen.getSnakeGameButton().setOnAction(event -> {
             menuScreen.getDispalyLabel().setVisible(false);
             menuScreen.getDispalyLabel().setManaged(false);
