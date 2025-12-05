@@ -67,9 +67,6 @@ public class GameManager extends Application{
         }
         attachListenersToLoginScreenButton(loginScreen);
         attachBackButtonListenerToLoginScreen(loginScreen);
-        /* TODO: if have time, add 1 more boolean and if not the first time logging in after registering, turn the label off, not here */
-        //loginScreen.getSuccessfulLabel().setVisible(false);
-        //loginScreen.getSuccessfulLabel().setManaged(false);
     }
 
     public void createAndGoToCreateAccountScreenScene(){
@@ -93,11 +90,10 @@ public class GameManager extends Application{
         BorderPane menuScreenRootNode = menuScreen.getRootNode();
         currScene.setRoot(menuScreenRootNode);
 
-        //TODO: attach listener to "Play Blackjack" Button
         attachListenersToMainMenuScreenButtons(menuScreen, username, menuScreen.getSnakeGameScores(), menuScreen.getBlackjackScores());
     }
 
-    public void attachListenersToMainMenuScreenButtons(MainMenuScreen menuScreen, String username, int[] snakeGameScores, int[] blackjackScores){ //TODO: Look, Top 5 highest Blackjack scores for curent user ready to use
+    public void attachListenersToMainMenuScreenButtons(MainMenuScreen menuScreen, String username, int[] snakeGameScores, int[] blackjackScores){
         menuScreen.getSnakeGameButton().setOnAction(event -> {
             menuScreen.getDispalyLabel().setVisible(false);
             menuScreen.getDispalyLabel().setManaged(false);
