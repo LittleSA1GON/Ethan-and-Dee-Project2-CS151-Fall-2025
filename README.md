@@ -65,4 +65,25 @@ Team Contributions:
 
 
 —Dee—
-- 
+- **Functional Snake Game**
+    Complete movement, collsion handling, food spawning, game loop and UI integration
+
+-  **BackgroundSetUp (Abstract Class)**
+    Provides consistent background image setup, dim overlay and styling shared across multiple screens
+
+-   **UI screens**
+    Implemented full layout, styling and interaction logic for: 
+    - `FirstScreen`  
+    - `CreateAccountScreen`  
+    - `LoginScreen`  
+    - `MainMenuScreen`  
+    - `ToolBarC`
+
+- **GameManger**
+    Manages screen initialization and navigation, linking all screens together:
+    `FirstScreen -> Login/Create Account -> Main Menu -> Snake Game/Blackjack`
+
+—------------------------------------------—------------------------------------------
+
+### Project Demo Video
+[![YouTube Video](https://img.youtube.com/vi/Q6W0qv5xLw0/0.jpg)](https://youtu.be/Q6W0qv5xLw0)
