@@ -1,0 +1,2 @@
+blackjack:User1+1000:User2+1000:User3+1000:User4+1000:User5+1000
+snake:User1+1000:User2+1000:User3+1000:User4+1000:User5+1000

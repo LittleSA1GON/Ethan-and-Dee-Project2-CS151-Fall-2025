@@ -454,8 +454,24 @@ public class SnakeGame extends BackgroundSetUp {
             long lastFrameTimeStamp = 0; //in nanoseconds
             long timeInterval = 0;
 
+            int counter = 0; 
+            long lastFpsTime = 0; 
+
             @Override
             public void handle(long nowFrameTimeStamp){
+
+                counter++; //to track FPS
+                
+                if(lastFpsTime == 0){
+                    lastFpsTime = nowFrameTimeStamp; 
+                }
+                
+                if(nowFrameTimeStamp - lastFpsTime >= 1_000_000_000){
+                    System.out.println("FPS: " + counter);   
+                    counter = 0; //reset
+                    lastFpsTime = nowFrameTimeStamp; 
+                }
+
                 if(isGameOver){
                     return;
                 }
@@ -481,7 +497,7 @@ public class SnakeGame extends BackgroundSetUp {
                     if(isGameOver){ return; } 
                     lastFrameTimeStamp = nowFrameTimeStamp;
                 }
-            }
+            } // end of handle() 
         };
         this.animationTimer.start(); //start the loop
         this.stackPaneRoot.requestFocus();
