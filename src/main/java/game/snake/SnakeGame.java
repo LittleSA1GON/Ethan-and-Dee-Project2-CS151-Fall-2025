@@ -454,19 +454,19 @@ public class SnakeGame extends BackgroundSetUp {
             long lastFrameTimeStamp = 0; //in nanoseconds
             long timeInterval = 0;
 
-            int counter = 0; 
+            int counter = 0; //to track FPS 
             long lastFpsTime = 0; 
 
             @Override
-            public void handle(long nowFrameTimeStamp){
+            public void handle(long nowFrameTimeStamp){ //javafx gives me -> nowFrameTimeStamp = current time in nanoseconds 
 
                 counter++; //to track FPS
-                
+
                 if(lastFpsTime == 0){
                     lastFpsTime = nowFrameTimeStamp; 
                 }
                 
-                if(nowFrameTimeStamp - lastFpsTime >= 1_000_000_000){
+                if(nowFrameTimeStamp - lastFpsTime >= 1_000_000_000){ //1_000_000_000 nanoseconds = 1 second
                     System.out.println("FPS: " + counter);   
                     counter = 0; //reset
                     lastFpsTime = nowFrameTimeStamp; 
